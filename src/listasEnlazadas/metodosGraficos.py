@@ -68,7 +68,7 @@ def displayList(estructura, tipo, nodosX=list()):
                 if tuples[i][1] != 'None':
                     dot.edge(str(tuples[i][0]), str(tuples[i-1][0]), color = colorLeft)
     
-    if tipo == 2:
+        """   if tipo == 2:
         dot2 = Digraph()
         dot2.graph_attr = {
             'rankdir': 'DT'
@@ -85,9 +85,13 @@ def displayList(estructura, tipo, nodosX=list()):
         #dot2.subgraph(dot3)
         #display(dot2)
         #display(dot)
-    else:
-        #display(dot)
-        image_bytes = dot.pipe(format='png')
+        image_bytes = dot.pipe(format='svg')
 
         # Devolver la imagen como una respuesta HTTP
-        return send_file(BytesIO(image_bytes), mimetype='image/png')
+        return send_file(BytesIO(image_bytes), mimetype='image/svg+xml')"""
+    #else:
+    #display(dot)
+    image_bytes = dot.pipe(format='svg')
+
+        # Devolver la imagen como una respuesta HTTP
+    return send_file(BytesIO(image_bytes), mimetype='image/svg+xml')

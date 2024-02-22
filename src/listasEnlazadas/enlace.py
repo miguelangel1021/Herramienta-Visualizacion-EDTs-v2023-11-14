@@ -87,9 +87,17 @@ def crearListaEnlazada(tipo, file, init, data={}):
         print(state_val)
         print(comment)
         print('Total elementos: ' + str(len(estructura.getNodeValues())))
+
+        response = { 
+            "msj": 'Crear Lista Enlazada ' + txt,
+            "estado": state_val,
+            "comment": comment,
+            "size": 'Total elementos: ' + str(len(estructura.getNodeValues()))
+        }
+
     else:
         print('ERROR: La estructura no tiene los dobles enlaces')
-    return estructura, dis 
+    return estructura, dis ,response 
 
 def anadirNodoLista(estructura, tipo, nodo):
     """
@@ -138,18 +146,34 @@ def anadirNodoLista(estructura, tipo, nodo):
         raise Exception(e)
     
     #out.clear_output()
-    displayList(estructura, tipo)
+    dis=displayList(estructura, tipo)
     # print('Tipo Lista: ' + str(tipo))
     print('Total elementos: ' + str(len(end_test)))
     print('Añadir elemento al Final')
-    
     print(state_val, comment)
+
+    response = { 
+            "msj": 'Añadir elemento al Final',
+            "estado": state_val,
+            "comment": comment,
+            "size": 'Total elementos: ' +  str(len(end_test)),
+            "Recorrido esperado hacia adelante": None,
+            "Recorrido obtenido hacia adelante": None,
+            "Recorrido esperado hacia atras": None,
+            "Recorrido obtenido hacia atras": None
+        }
+
     if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
-        print('Recorrido esperado hacia adelante:', end_val)
-        print('Recorrido obtenido hacia adelante:  ', end_test)
+        print('Recorrido esperado hacia adelante: ', end_val)
+        print('Recorrido obtenido hacia adelante: ', end_test)
+        response['Recorrido esperado hacia adelante'] = end_val
+        response['Recorrido obtenido hacia adelante'] = end_test
         if tipo == 2:
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:  ', end_test_anteriores)
+            response['Recorrido esperado hacia atras'] = end_val_anteriores
+            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+    return estructura, dis, response
 
 def anadirNodoListaFirst(estructura, tipo, nodo):
     """
@@ -192,18 +216,37 @@ def anadirNodoListaFirst(estructura, tipo, nodo):
         raise Exception(e)
     
     #out.clear_output()
-    displayList(estructura, tipo)
+    dis = displayList(estructura, tipo)
     print('Total elementos: ' + str(len(end_test)))           # CORRECCION modificar
     print('Añadir elemento al Principio')
     # print('Tipo Lista: ' + str(tipo))
 
     print(state_val, comment)
+
+    response = { 
+            "msj": 'Añadir elemento al Principio',
+            "estado": state_val,
+            "comment": comment,
+            "size": 'Total elementos: ' + str(len(end_test)),
+            "Recorrido esperado hacia adelante": None,
+            "Recorrido obtenido hacia adelante": None,
+            "Recorrido esperado hacia atras": None,
+            "Recorrido obtenido hacia atras": None
+        }
+
     if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
         print('Recorrido esperado hacia adelante:', end_val)
         print('Recorrido obtenido hacia adelante:', end_test)
+        response['Recorrido esperado hacia adelante'] = end_val
+        response['Recorrido obtenido hacia adelante'] = end_test
         if tipo == 2:
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:', end_test_anteriores)
+            response['Recorrido esperado hacia atras'] = end_val_anteriores
+            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+    
+    return estructura,dis,response 
+
 
 def eliminarNodoLista(estructura, tipo, nodo):
     """
@@ -243,17 +286,33 @@ def eliminarNodoLista(estructura, tipo, nodo):
         e = '\tProblema al eliminar el elemento "'+str(nodo)+'", método deleteNode_byValue()'
         raise Exception(e)                                              # CORRECCION Agregar
     #out.clear_output()
-    displayList(estructura, tipo)
+    dis = displayList(estructura, tipo)
     print('Total elementos: ' + str(len(end_test)))
     print('Eliminar elemento')
     
     print(state_val, comment)
-    if state_val == VALIDATION_STATES[-1]: # Si fue fallido, mostrar los resultados esperados y obtenidos
+    response = { 
+            "msj": 'Eliminar elemento',
+            "estado": state_val,
+            "comment": comment,
+            "size": 'Total elementos: ' + str(len(end_test)),
+            "Recorrido esperado hacia adelante": None,
+            "Recorrido obtenido hacia adelante": None,
+            "Recorrido esperado hacia atras": None,
+            "Recorrido obtenido hacia atras": None
+        }
+
+    if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
         print('Recorrido esperado hacia adelante:', end_val)
         print('Recorrido obtenido hacia adelante:', end_test)
+        response['Recorrido esperado hacia adelante'] = end_val
+        response['Recorrido obtenido hacia adelante'] = end_test
         if tipo == 2:
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:', end_test_anteriores)
+            response['Recorrido esperado hacia atras'] = end_val_anteriores
+            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+    return estructura,dis,response 
 
 def encontrarNodoLista(estructura, tipo, nodo):
     """
@@ -279,12 +338,18 @@ def encontrarNodoLista(estructura, tipo, nodo):
     lista = list()
     lista.append(nodo)
     if ans_val:
-        displayList(estructura, tipo, lista)
+        dis = displayList(estructura, tipo, lista)
     else:    
-        displayList(estructura, tipo)
+        dis = displayList(estructura, tipo)
 
     print("Buscar elemento")
     print(state_val, comment)
+    response = { 
+            "msj": 'Buscar elemento',
+            "estado": state_val,
+            "comment": comment
+        }
+    return estructura,dis, response
 
 def findAdjacentNodeLista(estructura, tipo, nodo):
     """
@@ -317,12 +382,23 @@ def findAdjacentNodeLista(estructura, tipo, nodo):
         raise Exception(e)
     
     #out.clear_output()
-    displayList(estructura, tipo, listaAdj)
+    dis = displayList(estructura, tipo, listaAdj)
+
     
     print('Encontrar Adyacentes')
+    response = { 
+            "msj": 'Encontrar Adyacentes',
+            "estado": state_val,
+            "comment": comment,
+            "existe" : None
+        }
     if not exists:
         print('\tEl elemento "'+str(nodo)+ '" NO existe en la lista')
+        response['existe'] = 'El elemento "'+str(nodo)+ '" NO existe en la lista'
     print(state_val, comment)
+
+    
+    return estructura,dis, response
 
 def darTodosLosNodos(estructura, tipo):
     """
@@ -341,11 +417,19 @@ def darTodosLosNodos(estructura, tipo):
     except:
         raise Exception('\tProblema al obtener todos los elemento, método getNodeValues()')
     #out.clear_output()
-    displayList(estructura, tipo)
+    dis = displayList(estructura, tipo)
     txt = ''
     for i in nodos:
         txt = txt + str(i) + ', '
     
+    response = { 
+            "msj": 'Encontrar Todos',
+            "size": str(len(nodos)),
+            "Elementos": str(txt[:-2]),
+        }
+
     print('Encontrar Todos')
     print('\tTotal Elementos:', str(len(nodos)))
     print('\tElementos:', txt[:-2])
+
+    return estructura, dis, response
