@@ -46,6 +46,24 @@ def restart():
 #Listas Enlazadas
 lista_blueprint = Blueprint('listas', __name__)
 
+
+@request_blueprint.route('/listas/crearVacio', methods= ['GET'])
+def crearListaVacia():
+    respuesta = crearListaEnlazada(actual.type, actual.file, "Vacia")
+    actual.estructura = respuesta[0]
+    response = make_response(respuesta[1])
+
+    # Establecer el tipo de contenido
+    response.headers['Content-Type'] = 'image/svg+xml'
+
+    # Establecer los encabezados con la información adicional
+    info = respuesta[2]
+    response.headers['msj'] = info["msj"]
+    response.headers['estado'] = info["estado"]
+    response.headers['comment'] = info["comment"]
+    response.headers['size'] = info["size"]
+    return response,200
+
 @request_blueprint.route('/listas/crearEstatica', methods= ['GET'])
 def crearListaEstatica():
     try:
@@ -77,8 +95,7 @@ def crearListaArchivo():
 
 """@request_blueprint.route('/listas/crearRandom', methods= ['GET'])
 def crearListaRandom():
-    json = request.get_json()
-    init = json.get('init')
+    init = "Random"
     respuesta = crearListaEnlazada(actual.type, actual.file, init)
     actual.estructura = respuesta[0]
 
