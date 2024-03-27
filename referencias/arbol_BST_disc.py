@@ -117,6 +117,18 @@ class bst():
             if right != None:
                 lst.append(right['key'])
         return existe, lst
+    
+    def size(self):
+        
+        return omap.size(self.estructura)
+    
+    def height(self):
+
+        return omap.height(self.estructura)
+    
+    def minKey(self):
+
+        return omap.minKey(self.estructura)
 
 
 def defaultfunction(elem_1, elem_2):

@@ -201,6 +201,8 @@ def validarEstructura(valid, tipo):
             actual = 'Arreglo'
         elif tipo == 6:
             actual = 'Tabla Hash LP'
+        elif tipo == 8:
+            actual = 'Arbol RBT'
         else:
             actual = 'Grafo NO Dirigido'
         comment = 'ERROR: La estructura actual es ' + actual
