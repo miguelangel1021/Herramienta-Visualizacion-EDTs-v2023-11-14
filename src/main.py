@@ -7,18 +7,21 @@ import config as cf
 from blueprints.requests import request_blueprint, lista_blueprint
 from errors.errors import ApiError
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 
 
 app = Flask(__name__)
 
+CORS(app)
 
 app.register_blueprint(request_blueprint)
 app.register_blueprint(lista_blueprint)
+
 @app.errorhandler(ApiError)
 def handle_exception(err):
     response = {
-      "mssg": err.description
+      "msg": err.description
     }
     return jsonify(response), err.code
 

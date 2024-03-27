@@ -92,6 +92,5 @@ def displayList(estructura, tipo, nodosX=list()):
     #else:
     #display(dot)
     image_bytes = dot.pipe(format='svg')
-
-        # Devolver la imagen como una respuesta HTTP
-    return send_file(BytesIO(image_bytes), mimetype='image/svg+xml')
+    #devuelve la imagen en bytes
+    return image_bytes 

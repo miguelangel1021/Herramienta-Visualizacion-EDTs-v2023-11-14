@@ -5,8 +5,9 @@ import json
 import config as cf
 from listasEnlazadas.enlace import crearListaEnlazada,anadirNodoLista,anadirNodoListaFirst,eliminarNodoLista,encontrarNodoLista,findAdjacentNodeLista,darTodosLosNodos
 from soporte.soporte import validarEstructura
-from errors.errors import IncompleteEstructure
-
+from errors.errors import DefaultError
+from io import BytesIO
+import base64
 
 
 actual=Actual(None, None, None, None)
@@ -41,6 +42,8 @@ def restart():
     return '',200
 
 
+
+#Listas Enlazadas
 lista_blueprint = Blueprint('listas', __name__)
 
 @request_blueprint.route('/listas/crearEstatica', methods= ['GET'])
@@ -52,27 +55,27 @@ def crearListaEstatica():
         print(data)
     except:
         e = "\tProblema al cargar el archivo estatico " + name
-        raise Exception (e)               
-    respuesta = crearListaEnlazada(actual.type, actual.file, "Estática", data)
+        raise DefaultError(e)
+    try:               
+        respuesta = crearListaEnlazada(actual.type, actual.file, "Estática", data)
+    except Exception as e:
+        raise DefaultError(e)
     actual.estructura = respuesta[0]
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
+
 
 @request_blueprint.route('/listas/crearArchivo', methods= ['GET'])
 def crearListaArchivo():
     pass
 
-@request_blueprint.route('/listas/crearRandom', methods= ['GET'])
+"""@request_blueprint.route('/listas/crearRandom', methods= ['GET'])
 def crearListaRandom():
     json = request.get_json()
     init = json.get('init')
@@ -90,7 +93,31 @@ def crearListaRandom():
     response.headers['estado'] = info["estado"]
     response.headers['comment'] = info["comment"]
     response.headers['size'] = info["size"]
-    return response,200
+    return response,200"""
+
+@request_blueprint.route('/listas/crearRandom', methods=['GET'])
+def crearListaRandom():
+    init = "Random"
+
+    try:
+        respuesta = crearListaEnlazada(actual.type, actual.file, init)
+    except Exception as e:
+        raise DefaultError(e)
+    
+    actual.estructura = respuesta[0]
+    # Obtener la información adicional
+    info = respuesta[2]
+    # Convertir la imagen SVG a una cadena
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    # Devolver el objeto JSON junto con la imagen SVG
+    return jsonify(response_data), 200
+
+
 
 @request_blueprint.route('/listas/AñadirNodo', methods= ['GET'])
 def añadirNodoLista():
@@ -107,33 +134,22 @@ def añadirNodoLista():
                 if not state:
                         print(comment)
             except:
-                raise IncompleteEstructure
+                raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
                 respuesta = anadirNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-                print('Hubo un problema al intentar añadir un elemento')
-                print(e)
+            raise DefaultError(e)
 
     actual.estructura = respuesta[0]
 
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    response.headers['Recorrido esperado hacia adelante'] = info['Recorrido esperado hacia adelante'] 
-    response.headers['Recorrido obtenido hacia adelante'] = info['Recorrido obtenido hacia adelante']
-    if actual.type == 2:
-        response.headers['Recorrido esperado hacia atras'] = info['Recorrido esperado hacia atras'] 
-        response.headers['Recorrido obtenido hacia atras'] = info['Recorrido obtenido hacia atras']
-
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
 
 @request_blueprint.route('/listas/AñadirPrincipio', methods= ['GET'])
 def añadirNodoPrincipio():
@@ -150,33 +166,21 @@ def añadirNodoPrincipio():
                 if not state:
                         print(comment)
             except:
-                raise IncompleteEstructure
+                raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
                 respuesta = anadirNodoListaFirst(actual.estructura, actual.type, data)
         except Exception as e:
-                print('Hubo un problema al intentar añadir un elemento')
-                print(e)
+            raise DefaultError(e)
 
     actual.estructura = respuesta[0]
-
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    response.headers['Recorrido esperado hacia adelante'] = info['Recorrido esperado hacia adelante'] 
-    response.headers['Recorrido obtenido hacia adelante'] = info['Recorrido obtenido hacia adelante']
-    if actual.type == 2:
-        response.headers['Recorrido esperado hacia atras'] = info['Recorrido esperado hacia atras'] 
-        response.headers['Recorrido obtenido hacia atras'] = info['Recorrido obtenido hacia atras']
-
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
 
 
 @request_blueprint.route('/listas/EliminarNodo', methods= ['GET'])
@@ -194,33 +198,22 @@ def eliminarNodo():
                 if not state:
                         print(comment)
             except:
-                raise IncompleteEstructure
+                raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
                 respuesta = eliminarNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-                print('Hubo un problema al intentar eliminar un elemento')
-                print(e)
+            raise DefaultError(e)
 
     actual.estructura = respuesta[0]
-
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
     # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    response.headers['Recorrido esperado hacia adelante'] = info['Recorrido esperado hacia adelante'] 
-    response.headers['Recorrido obtenido hacia adelante'] = info['Recorrido obtenido hacia adelante']
-    if actual.type == 2:
-        response.headers['Recorrido esperado hacia atras'] = info['Recorrido esperado hacia atras'] 
-        response.headers['Recorrido obtenido hacia atras'] = info['Recorrido obtenido hacia atras']
-
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
 
 @request_blueprint.route('/listas/EncontarNodo', methods= ['GET'])
 def encontrarNodo():
@@ -237,27 +230,22 @@ def encontrarNodo():
                 if not state:
                         print(comment)
             except:
-                raise IncompleteEstructure
+                raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
                 respuesta = encontrarNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-                print('Hubo un problema al intentar encontrar un elemento')
-                print(e)
+            raise DefaultError(e)
 
     actual.estructura = respuesta[0]
-
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
+    
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
 
 @request_blueprint.route('/listas/EncontarAdyacentes', methods= ['GET'])
 def encontrarAdyacentes():
@@ -274,28 +262,23 @@ def encontrarAdyacentes():
                 if not state:
                         print(comment)
             except:
-                raise IncompleteEstructure
+                raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
                 respuesta = findAdjacentNodeLista(actual.estructura, actual.type, data)
         except Exception as e:
-                print('Hubo un problema al intentar encontrar un elemento')
-                print(e)
+            raise DefaultError(e)
 
     actual.estructura = respuesta[0]
 
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['existe'] = info["existe"]
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
 
-    return response,200
+    return jsonify(response_data),200
 
 
 @request_blueprint.route('/listas/EncontrarTodos', methods= ['GET'])
@@ -307,24 +290,19 @@ def encontrarTodos():
             if not state:
                 print(comment)
         except:
-            raise IncompleteEstructure
+            raise DefaultError("La estructura no ha sido creada correctamente")
         if state:
             respuesta = darTodosLosNodos(actual.estructura, actual.type)
     except Exception as e:
-        print('Hubo un problema al intentar encontrar todos los elementos')
-        print(e)
+        raise DefaultError(e)
 
     actual.estructura = respuesta[0]
 
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['size'] = info["size"]
-    response.headers['Elementos'] = info["Elementos"]
-
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200

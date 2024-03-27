@@ -96,6 +96,7 @@ def crearListaEnlazada(tipo, file, init, data={}):
         }
 
     else:
+        response = {"msj":'ERROR: La estructura no tiene los dobles enlaces' }
         print('ERROR: La estructura no tiene los dobles enlaces')
     return estructura, dis ,response 
 
