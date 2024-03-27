@@ -49,20 +49,19 @@ lista_blueprint = Blueprint('listas', __name__)
 
 @request_blueprint.route('/listas/crearVacio', methods= ['GET'])
 def crearListaVacia():
-    respuesta = crearListaEnlazada(actual.type, actual.file, "Vacia")
+    try:
+        respuesta = crearListaEnlazada(actual.type, actual.file, "Vacia")
+    except Exception as e:
+        raise DefaultError(e)
     actual.estructura = respuesta[0]
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
     info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    return response,200
+    image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
 
 @request_blueprint.route('/listas/crearEstatica', methods= ['GET'])
 def crearListaEstatica():
@@ -115,7 +114,6 @@ def crearListaRandom():
 @request_blueprint.route('/listas/crearRandom', methods=['GET'])
 def crearListaRandom():
     init = "Random"
-
     try:
         respuesta = crearListaEnlazada(actual.type, actual.file, init)
     except Exception as e:
