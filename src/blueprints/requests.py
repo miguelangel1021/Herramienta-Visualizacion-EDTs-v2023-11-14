@@ -162,7 +162,7 @@ def crearListaRandom():
 
 
 
-@request_blueprint.route('/listas/AñadirNodo', methods= ['GET'])
+@request_blueprint.route('/listas/AñadirNodo', methods= ['POST'])
 def añadirNodoLista():
     json = request.get_json()
     value = json.get('value').strip()
@@ -196,7 +196,7 @@ def añadirNodoLista():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/listas/AñadirPrincipio', methods= ['GET'])
+@request_blueprint.route('/listas/AñadirPrincipio', methods= ['POST'])
 def añadirNodoPrincipio():
     json = request.get_json()
     value = json.get('value').strip()
@@ -230,7 +230,7 @@ def añadirNodoPrincipio():
     return jsonify(response_data),200
 
 
-@request_blueprint.route('/listas/EliminarNodo', methods= ['GET'])
+@request_blueprint.route('/listas/EliminarNodo', methods= ['POST'])
 def eliminarNodo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -264,7 +264,7 @@ def eliminarNodo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/listas/EncontarNodo', methods= ['GET'])
+@request_blueprint.route('/listas/EncontarNodo', methods= ['POST'])
 def encontrarNodo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -298,7 +298,7 @@ def encontrarNodo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/listas/EncontarAdyacentes', methods= ['GET'])
+@request_blueprint.route('/listas/EncontarAdyacentes', methods= ['POST'])
 def encontrarAdyacentes():
     json = request.get_json()
     value = json.get('value').strip()
@@ -450,7 +450,7 @@ def crearArbolArchivo():
     pass
 
 
-@request_blueprint.route('/arboles/añadirNodo', methods= ['GET'])
+@request_blueprint.route('/arboles/añadirNodo', methods= ['POST'])
 def AñadirNodoArbol():
     json = request.get_json()
     value = json.get('value').strip()
@@ -487,7 +487,7 @@ def AñadirNodoArbol():
     return jsonify(response_data),200
 
 
-@request_blueprint.route('/arboles/eliminarNodo', methods= ['GET'])
+@request_blueprint.route('/arboles/eliminarNodo', methods= ['POST'])
 def EliminarNodoArbol():
     json = request.get_json()
     value = json.get('value').strip()
@@ -523,7 +523,7 @@ def EliminarNodoArbol():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/arboles/encontrarNodo', methods= ['GET'])
+@request_blueprint.route('/arboles/encontrarNodo', methods= ['POST'])
 def EncontrarNodoArbol():
     json = request.get_json()
     value = json.get('value').strip()
@@ -559,7 +559,7 @@ def EncontrarNodoArbol():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/arboles/encontrarAdyacentes', methods= ['GET'])
+@request_blueprint.route('/arboles/encontrarAdyacentes', methods= ['POST'])
 def EncontrarAdyacentesArbol():
     json = request.get_json()
     value = json.get('value').strip()
@@ -595,7 +595,7 @@ def EncontrarAdyacentesArbol():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/arboles/nodos', methods= ['GET'])
+@request_blueprint.route('/arboles/nodos', methods= ['POST'])
 def NodosArbol():
     json = request.get_json()
     order= json.get('order')
@@ -685,7 +685,7 @@ def crearGrafoEstatico():
 def crearGrafosArchivo():
     pass
 
-@request_blueprint.route('/grafos/añadirNodo', methods= ['GET'])
+@request_blueprint.route('/grafos/añadirNodo', methods= ['POST'])
 def AñadirNodoGrafo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -714,7 +714,7 @@ def AñadirNodoGrafo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/grafos/eliminarNodo', methods= ['GET'])
+@request_blueprint.route('/grafos/eliminarNodo', methods= ['POST'])
 def EliminarNodoGrafo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -743,7 +743,7 @@ def EliminarNodoGrafo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/grafos/encontrarNodo', methods= ['GET'])
+@request_blueprint.route('/grafos/encontrarNodo', methods= ['POST'])
 def EncontrarNodoGrafo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -772,7 +772,7 @@ def EncontrarNodoGrafo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/grafos/añadirArco', methods= ['GET'])
+@request_blueprint.route('/grafos/añadirArco', methods= ['POST'])
 def AñadirArco():
     json = request.get_json()
     origen = json.get('origen').strip()
@@ -803,7 +803,7 @@ def AñadirArco():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/grafos/encontrarAdyacents', methods= ['GET'])
+@request_blueprint.route('/grafos/encontrarAdyacents', methods= ['POST'])
 def encontrarAdyacentesGrafo():
     json = request.get_json()
     value = json.get('value').strip()
@@ -859,7 +859,7 @@ def NodosGrafo():
     return jsonify(response_data),200
 
 
-@request_blueprint.route('/grafos/recorridos', methods= ['GET'])
+@request_blueprint.route('/grafos/recorridos', methods= ['POST'])
 def recorridosGrafo():
     json = request.get_json()
     nodo = json.get('vertice').strip()
