@@ -49,9 +49,9 @@ def cargarArchvioPorDefecto():
     if actual.type ==1 or actual.type == 2:
         archivo = "\\referencias\lista_disc.py"
     elif  actual.type == 3:
-        archivo = "\\referencias\arbol_BST_disc.py"
+        archivo = "\\referencias\\arbol_BST_disc.py"
     elif  actual.type == 8:
-        archivo = "\\referencias\arbol_RBT_disc.py"
+        archivo = "\\referencias\\arbol_RBT_disc.py"
     else:
         archivo = "\\referencias\grafo_disc.py"
 
@@ -669,6 +669,7 @@ def crearGrafoEstatico():
         'info': info
     }
 
+
     #Prueba para verificar si se crea correctamente la imagen
     """nombre_archivo = 'imagen.svg'  # Puedes ajustar el nombre y la extensión del archivo según sea necesario
 
@@ -676,6 +677,7 @@ def crearGrafoEstatico():
     with open(nombre_archivo, 'wb') as f:
         f.write(respuesta[0])"""
 
+ 
     return jsonify(response_data),200
 
 
