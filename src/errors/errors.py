@@ -1,5 +1,7 @@
+
 class ApiError(Exception):
     code = 422
+    description = "Default_message"
 
 
 """class NotFound(ApiError):

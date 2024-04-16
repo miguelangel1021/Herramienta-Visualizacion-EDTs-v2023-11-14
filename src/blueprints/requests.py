@@ -78,7 +78,7 @@ def crearListaVacia():
     try:
         respuesta = crearListaEnlazada(actual.type, actual.file, "Vacia")
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -99,11 +99,11 @@ def crearListaEstatica():
         print(data)
     except:
         e = "\tProblema al cargar el archivo estatico " + name
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     try:               
         respuesta = crearListaEnlazada(actual.type, actual.file, "Estática", data)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -145,7 +145,7 @@ def crearListaRandom():
     try:
         respuesta = crearListaEnlazada(actual.type, actual.file, init)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     
     actual.estructura = respuesta[0]
     # Obtener la información adicional
@@ -183,7 +183,7 @@ def añadirNodoLista():
             if state:
                 respuesta = anadirNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
 
@@ -217,7 +217,7 @@ def añadirNodoPrincipio():
             if state:
                 respuesta = anadirNodoListaFirst(actual.estructura, actual.type, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
     info = respuesta[2]
@@ -251,7 +251,7 @@ def eliminarNodo():
             if state:
                 respuesta = eliminarNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
     # Establecer los encabezados con la información adicional
@@ -285,7 +285,7 @@ def encontrarNodo():
             if state:
                 respuesta = encontrarNodoLista(actual.estructura, actual.type, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
     
@@ -319,7 +319,7 @@ def encontrarAdyacentes():
             if state:
                 respuesta = findAdjacentNodeLista(actual.estructura, actual.type, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
 
@@ -349,7 +349,7 @@ def encontrarTodos():
         if state:
             respuesta = darTodosLosNodos(actual.estructura, actual.type)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
 
     actual.estructura = respuesta[0]
 
@@ -373,7 +373,7 @@ def crearArbolRandom():
         else:
             respuesta = crearRBT(init, actual.file)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
@@ -397,7 +397,7 @@ def crearArbolEstatico():
         print(data)
     except:
         e = "\tProblema al cargar el archivo estatico " + name
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     try:  
         if actual.type == 3:
             respuesta = crearBST("Estática", actual.file, data)
@@ -405,7 +405,7 @@ def crearArbolEstatico():
             respuesta = crearRBT("Estática", actual.file, data)
 
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -434,7 +434,7 @@ def crearArbolVacio():
         else:
             respuesta = crearRBT("Vacia", actual.file)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -474,7 +474,7 @@ def AñadirNodoArbol():
                 else:
                     respuesta = anadirNodoRBT(actual.estructura, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -511,7 +511,7 @@ def EliminarNodoArbol():
                 else:
                     respuesta = eliminarNodoRBT(actual.estructura, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -547,7 +547,7 @@ def EncontrarNodoArbol():
                 else:
                     respuesta = encontrarNodoRBT(actual.estructura, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -583,7 +583,7 @@ def EncontrarAdyacentesArbol():
                 else:
                     respuesta = findAdjacentNodoRBT(actual.estructura, data)
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -611,7 +611,7 @@ def NodosArbol():
             else:
                 respuesta = listarNodosRBT(actual.estructura, order)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -631,7 +631,7 @@ def crearGrafoRandom():
     try:
         respuesta = crearGraph(init, actual.type ,actual.file, labels=True)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
@@ -655,11 +655,11 @@ def crearGrafoEstatico():
         print(data)
     except:
         e = "\tProblema al cargar el archivo estatico " + name
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     try:  
         respuesta = crearGraph("Estática", actual.type ,actual.file,data,labels=True)
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -702,7 +702,7 @@ def AñadirNodoGrafo():
             if state:
                 respuesta = anadirNodoGraph(actual.estructura, actual.type, True, value)    
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -731,7 +731,7 @@ def EliminarNodoGrafo():
             if state:
                 respuesta = eliminarNodoGraph(actual.estructura, actual.type, True, value)    
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -760,7 +760,7 @@ def EncontrarNodoGrafo():
             if state:
                 respuesta = existeNodoGraph(actual.estructura, actual.type, True, value)    
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -791,7 +791,7 @@ def AñadirArco():
             if state:
                 respuesta = anadirArcoGraph(actual.estructura, actual.type, True, origen, destino, peso)    
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -820,7 +820,7 @@ def encontrarAdyacentesGrafo():
             if state:
                 respuesta = adyacentesNodoGraph(actual.estructura, actual.type, True, value)    
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -846,7 +846,7 @@ def NodosGrafo():
         if state:
             respuesta = encontrarNodosGraph(actual.estructura, actual.type, True)    
     except Exception as e:
-        raise DefaultError(e)
+        raise DefaultError(str(e))
 
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -881,7 +881,7 @@ def recorridosGrafo():
                 else:
                     respuesta = recorridosGraph(actual.estructura, actual.type, True, recorrido, nodo)  
         except Exception as e:
-            raise DefaultError(e)
+            raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')

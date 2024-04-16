@@ -189,7 +189,6 @@ def anadirNodoListaFirst(estructura, tipo, nodo):
     Raises:
         Exception
     """
-
     init_test = list()                                         # CORRECCION Agregar
     end_test = list()                                         # CORRECCION Agregar
     try:
