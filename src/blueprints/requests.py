@@ -166,6 +166,7 @@ def crearListaRandom():
 def añadirNodoLista():
     json = request.get_json()
     value = json.get('value').strip()
+    raise DefaultError("Este es el error")
     if len(value) > 0:
         try:
             try:
@@ -181,7 +182,11 @@ def añadirNodoLista():
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = anadirNodoLista(actual.estructura, actual.type, data)
+                try:
+                    respuesta = anadirNodoLista(actual.estructura, actual.type, data)
+                except Exception as e:
+                    raise DefaultError(e)
+                
         except Exception as e:
             raise DefaultError(e)
 
@@ -624,6 +629,7 @@ def NodosArbol():
     return jsonify(response_data),200
 
 
+
 @request_blueprint.route('/grafos/crearRandom', methods= ['GET'])
 def crearGrafoRandom():
     actual.estructura = None
@@ -644,6 +650,7 @@ def crearGrafoRandom():
     }
     # Devolver el objeto JSON junto con la imagen SVG
     return jsonify(response_data), 200
+
 
 @request_blueprint.route('/grafos/crearEstatico', methods= ['GET'])
 def crearGrafoEstatico():
@@ -681,9 +688,24 @@ def crearGrafoEstatico():
     return jsonify(response_data),200
 
 
-@request_blueprint.route('/grafos/crearArchivo', methods= ['GET'])
-def crearGrafosArchivo():
-    pass
+@request_blueprint.route('/grafos/crearVacio', methods= ['GET'])
+def crearGrafoVacio():
+    actual.estructura = None
+    try:
+        respuesta = crearGraph("Vacia", actual.type ,actual.file,labels=True)
+    except Exception as e:
+        raise DefaultError(e)
+    actual.estructura = respuesta[1]
+    info = respuesta[2]
+    image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
+
+
 
 @request_blueprint.route('/grafos/añadirNodo', methods= ['POST'])
 def AñadirNodoGrafo():
