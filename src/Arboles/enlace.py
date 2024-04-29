@@ -326,6 +326,7 @@ def listarNodosBST(estructura, orden):
             'state': state_val,
             'comment': comment,
             'Size BST': estructura.size(),
+            'Nodes': nodos,
             'Height BST': estructura.height(),
             'minKey BST': estructura.minKey(),
             'Se esperaba': None,
