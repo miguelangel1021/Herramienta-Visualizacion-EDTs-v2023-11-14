@@ -30,11 +30,13 @@ def cargarArchvio():
     file = request.files['file']
     if file.filename == '':
         raise DefaultError('No selected file')
-    
-    file_content = file.read()
-    spec = importlib.util.spec_from_loader('',loader=None, origin=file.filename)
-    foo = importlib.util.module_from_spec(spec)
-    exec(file_content, foo.__dict__)
+    try:
+        file_content = file.read()
+        spec = importlib.util.spec_from_loader('',loader=None, origin=file.filename)
+        foo = importlib.util.module_from_spec(spec)
+        exec(file_content, foo.__dict__)
+    except Exception as e:
+        raise DefaultError(e)
 
     actual.file = foo
     return '',200
@@ -696,7 +698,7 @@ def AñadirNodoGrafo():
                     raise DefaultError("La estructura no ha sido creada correctamente")
                 state, comment = validarEstructura([4,7], actual.type)
                 if not state:
-                    print(comment)
+                    print(actual.type ,state, comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:

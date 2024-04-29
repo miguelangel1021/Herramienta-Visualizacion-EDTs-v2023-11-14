@@ -264,17 +264,23 @@ def validar_lista_eliminar(init_test, end_test, nodo, tipo, ans):
         structure_ref.addNode_byValue(i)
     ans2 = structure_ref.deleteNode_byValue(nodo)  #Ejecutar accion
     end_val = structure_ref.getNodeValues() #Resultado de validacion
+    print(end_val, end_test)
 
     if len(end_test) != len(end_val):         # numero de elementos diferentes despues de la operacion
         detail = 'El numero de elementos resultado de la operacion es diferente. Se esperaba ' + str(len(end_val)) + ' y se obtuvo ' + str(len(end_test))
         comment = 'Problema en eliminacion de "'+ str(nodo) + '" \n' + detail
         state_val = VALIDATION_STATES[-1]
-    elif ans == ans2 and ans:   # key aparecia en Lista y se elimino
+    elif end_test == end_val and ans == ans2 and ans:   # key aparecia en Lista y se elimino
+        print("Se elimino correctamente")
         comment = 'El elemento "'+ str(nodo) + '" se eliminó satisfactoriamente'
         state_val = VALIDATION_STATES[1]
+    elif len(end_test) == len(end_val) and nodo in end_test: # Elimino un elemento de forma incorrecta
+        comment = 'El elemento "'+ str(nodo) + '" no fue eliminado, Se eliminó un elemento diferente'
+        state_val = VALIDATION_STATES[0]
     elif ans == ans2:         # key No aparece en Lista y No se elimino
         comment = 'El elemento "'+ str(nodo) + '" NO esta en la Lista y NO se eliminó'
         state_val = VALIDATION_STATES[0]
+
     else:
         detail = 'El resultado de return del método es diferente al esperado. Se esperaba ' + str(ans2) + ' y se obtuvo ' + str(ans)
         comment = 'Problema en eliminacion de "'+ str(nodo) + '" \n' + detail

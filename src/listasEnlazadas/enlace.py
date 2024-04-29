@@ -173,7 +173,7 @@ def anadirNodoLista(estructura, tipo, nodo):
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:  ', end_test_anteriores)
             response['Recorrido esperado hacia atras'] = end_val_anteriores
-            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+            response['Recorrido obtenido hacia atras'] = end_test_anteriores
     return estructura, dis, response
 
 def anadirNodoListaFirst(estructura, tipo, nodo):
@@ -243,7 +243,7 @@ def anadirNodoListaFirst(estructura, tipo, nodo):
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:', end_test_anteriores)
             response['Recorrido esperado hacia atras'] = end_val_anteriores
-            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+            response['Recorrido obtenido hacia atras'] = end_test_anteriores
     
     return estructura,dis,response 
 
@@ -311,7 +311,7 @@ def eliminarNodoLista(estructura, tipo, nodo):
             print('Recorrido esperado hacia atras:', end_val_anteriores)
             print('Recorrido obtenido hacia atras:', end_test_anteriores)
             response['Recorrido esperado hacia atras'] = end_val_anteriores
-            response['Recorrido obtenido hacia atra'] = end_test_anteriores
+            response['Recorrido obtenido hacia atras'] = end_test_anteriores
     return estructura,dis,response 
 
 def encontrarNodoLista(estructura, tipo, nodo):
