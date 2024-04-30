@@ -121,8 +121,10 @@ def crearGraph(init, tipo, file=None, data={},labels=False):
     print(st_edges)
     print(state_val, comment)
 
-    info = {'Crear Grafo': txt,
+    info = {'Operación': 'Crear Grafo' + txt,
+            'Numero de nodos' : estructura.sizeNodes(),
             'Nodos': st_nodos,
+            'Numero de Arcos': estructura.sizeEdges(),
             'Arcos': st_edges,
             'state': state_val,
             'comment': comment
@@ -218,7 +220,7 @@ def eliminarNodoGraph(estructura, tipo, label, nodo):
     print(state_val, comment)
 
     info = {'Operación': 'Eliminar vertice',
-            'Vertice': str(nodo),
+            'Nodo': str(nodo),
             'state': state_val,
             'comment': comment}
     
@@ -257,7 +259,7 @@ def existeNodoGraph(estructura, tipo, label, nodo):
     print(state_val, comment)
 
     info = {'Operación': 'Buscar elemento',
-            'Vertice': str(nodo),
+            'Nodo': str(nodo),
             'state': state_val,
             'comment': comment}
     

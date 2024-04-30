@@ -400,6 +400,7 @@ def crearArbolEstatico():
     except:
         e = "\tProblema al cargar el archivo estatico " + name
         raise DefaultError(str(e))
+    
     try:  
         if actual.type == 3:
             respuesta = crearBST("Estática", actual.file, data)
@@ -407,6 +408,7 @@ def crearArbolEstatico():
             respuesta = crearRBT("Estática", actual.file, data)
 
     except Exception as e:
+        print(e)
         raise DefaultError(str(e))
     actual.estructura = respuesta[1]
     info = respuesta[2]
@@ -435,6 +437,7 @@ def crearArbolVacio():
             respuesta = crearBST("Vacia", actual.file)
         else:
             respuesta = crearRBT("Vacia", actual.file)
+    
     except Exception as e:
         raise DefaultError(str(e))
     actual.estructura = respuesta[1]
@@ -630,6 +633,27 @@ def NodosArbol():
 def crearGrafoRandom():
     actual.estructura = None
     init = "Random"
+    try:
+        respuesta = crearGraph(init, actual.type ,actual.file, labels=True)
+    except Exception as e:
+        raise DefaultError(str(e))
+    actual.estructura = respuesta[1]
+    # Obtener la información adicional
+    info = respuesta[2]
+    # Convertir la imagen SVG a una cadena
+    image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    # Devolver el objeto JSON junto con la imagen SVG
+    return jsonify(response_data), 200
+
+@request_blueprint.route('/grafos/crearVacio', methods= ['GET'])
+def crearGrafoVacio():
+    actual.estructura = None
+    init = "Vacio"
     try:
         respuesta = crearGraph(init, actual.type ,actual.file, labels=True)
     except Exception as e:

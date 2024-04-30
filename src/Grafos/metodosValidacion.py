@@ -144,6 +144,12 @@ def validar_graph_anadir(init_test, end_test, tipo, nodo):
     if len(end_ref) != len(end_test):
         comment = 'Se tiene una cantidad diferente de vertices a los esperados'
         state_val = VALIDATION_STATES[-1]
+    elif nodo not in end_test:
+        comment = 'El numero de nodos es correcto, pero el nodo no fue añadido'
+        state_val = VALIDATION_STATES[-1]
+    elif init_test == end_test:
+        comment = 'El nodo ya se encontraba en el grafo'
+        state_val = VALIDATION_STATES[0]
     else:
         comment = 'Adición de vértice satisfactoria'
         state_val = VALIDATION_STATES[1]

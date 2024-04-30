@@ -400,12 +400,14 @@ def crearRBT(init, file, data={}):
     print('Crear RBT ' + init + ':')
     print(state_val)    
     print(comment)
-    print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    #print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    print('Altura del arbol: ', str(estructura.size()))
 
     info = {"Crear RBT": init,
             'state': state_val,
             'comment': comment,
-            'Altura del arbol': str(omap.height(estructura.estructura)),}
+            #'Altura del arbol': str(omap.height(estructura.estructura)),}
+            'Altura del arbol':  str(estructura.size()),}
 
 
     return dis, estructura, info
@@ -444,12 +446,12 @@ def anadirNodoRBT(estructura, nodo):
     print(state_val + ':', comment)
 
     print("Llaves: ", end_test)
-    print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    print('Altura del arbol: ', str(estructura.size()))
 
     info = {"Añadir elemento": nodo,
             'state': state_val,
             'comment': comment,
-            'Altura del arbol':  str(omap.height(estructura.estructura)),
+            'Altura del arbol': str(estructura.size()),
             'Se esperaba': None,
             'Se obtuvo': None}
 
@@ -493,14 +495,14 @@ def eliminarNodoRBT(estructura, nodo):
 
     nodos = estructura.getNodeValues()
     print("Vertices: ", nodos)
-    print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    print('Altura del arbol: ', str(estructura.size()))
 
 
     info = {"Eliminar elemento": nodo,
             'state': state_val,
             'comment': comment,
             "Vertices":nodos,
-            'Altura del arbol':  str(omap.height(estructura.estructura)),
+            'Altura del arbol':  str(estructura.size()),
             'Se esperaba': None,
             'Se obtuvo': None}
 
@@ -547,7 +549,7 @@ def encontrarNodoRBT(estructura, nodo):
             'state': state_val,
             'comment': comment,
             "Vertices":nodos,
-            'Altura del arbol':  str(omap.height(estructura.estructura))}
+            'Altura del arbol':  (str(estructura.size()))}
 
     # nodos = estructura.getNodeValues()
     # print("Vertices: ", nodos)
@@ -591,13 +593,13 @@ def findAdjacentNodoRBT(estructura, nodo):
     
     nodos = estructura.getNodeValues()
     print("Nodos: ", nodos)
-    print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    print('Altura del arbol: ', str(estructura.size()))
 
     info = {"Encontrar Adyacentes": nodo,
             'state': state_val,
             'comment': comment,
             "Nodos":nodos,
-            'Altura del arbol':  str(omap.height(estructura.estructura))}
+            'Altura del arbol':  str(estructura.size())}
     
     return dis, estructura, info
     
@@ -630,11 +632,11 @@ def listarNodosRBT(estructura, orden):
     dis = displayRBT(estructura)
     print('Listar todos los vertices')
     print(nodos)
-    print('Altura del arbol: ', str(omap.height(estructura.estructura)))
+    print('Altura del arbol: ', str(estructura.size()))
     #print(state_val, comment)
 
     info = {"Listar todos los vertices": "operacion",
             "Nodos":nodos,
-            'Altura del arbol':  str(omap.height(estructura.estructura))}
+            'Altura del arbol':  str(estructura.size())}
     
     return dis, estructura, info
