@@ -55,7 +55,7 @@ def crearGraph(init, tipo, file=None, data={},labels=False):
                 raise Exception(e)
         for i,j,k in edges:
             try:
-                estructura.addEdge_byValue(i,j,k)
+                estructura.addEdge_byValue(str(i),str(j),k)
                 if tipo == 5:
                     arco = '(' + str(i) + ' <-> ' + str(j) + ', ' + str(round(k,2))+ ')'
                 else:

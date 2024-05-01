@@ -15,3 +15,11 @@ class DefaultError(ApiError):
     def __init__(self, description):
         self.description = description
 
+
+class IdNotInRequest(Exception):
+    code = 401
+    description = "El Session Id no esta en el request"
+
+class ExpiredSessionId(Exception):
+    code = 402
+    description = "El Session-Id a expirado, ingrese nuevamente"

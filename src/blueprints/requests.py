@@ -7,24 +7,58 @@ from listasEnlazadas.enlace import crearListaEnlazada,anadirNodoLista,anadirNodo
 from Arboles.enlace import crearBST, crearRBT, anadirNodoBST, anadirNodoRBT, eliminarNodoBST, eliminarNodoRBT, findAdjacentNodoBST, findAdjacentNodoRBT, listarNodosBST, listarNodosRBT, encontrarNodoBST, encontrarNodoRBT
 from soporte.soporte import validarEstructura
 from Grafos.enlace import crearGraph, adyacentesNodoGraph,anadirArcoGraph,anadirNodoGraph, eliminarNodoGraph, existeNodoGraph, encontrarNodosGraph, recorridosGraph
-from errors.errors import DefaultError
+from errors.errors import DefaultError, IdNotInRequest, ExpiredSessionId
 from io import BytesIO
 import base64
+import uuid
 
 
-actual=Actual(None, None, None, None)
+
+
 request_blueprint = Blueprint('config', __name__)
 
+user_sessions={}
 
+@request_blueprint.route('/config/create_session', methods=['GET'])
+def create_session():
+    # Generar un Session-Id único
+    session_id = str(uuid.uuid4())
+
+    # Crear una nueva estructura de datos de sesión para este Session-Id
+    user_sessions[session_id] = Actual(None, None, None, None)
+
+    # Devolver el Session-Id
+    response = make_response(jsonify({'session_id': session_id}), 200)
+
+    # Establecer la cookie en la respuesta
+    response.set_cookie('session_id', session_id)
+
+    return response
 
 @request_blueprint.route('/config/type', methods= ['POST'])
 def asignarEstructura():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        user_sessions[session_id] = Actual(None, None, None, None)
+    
     json = request.get_json()
-    actual.type = json.get('type')
+    user_sessions[session_id].type = json.get('type')
     return '',200
 
 @request_blueprint.route('/config/cargar', methods= ['POST'])
 def cargarArchvio():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     if 'file' not in request.files:
         raise DefaultError('No file part')
     file = request.files['file']
@@ -38,37 +72,55 @@ def cargarArchvio():
     except Exception as e:
         raise DefaultError(e)
 
-    actual.file = foo
+    user_sessions[session_id].file = foo
+
     return '',200
 
 
 
 @request_blueprint.route('/config/porDefecto', methods= ['POST'])
 def cargarArchvioPorDefecto():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
     json = request.get_json()
-    actual.type = json.get('type')
+    user_sessions[session_id].type = json.get('type')
     archivo = ''
-    if actual.type ==1 or actual.type == 2:
+    if user_sessions[session_id].type ==1 or user_sessions[session_id].type == 2:
         archivo = "\\referencias\lista_disc.py"
-    elif  actual.type == 3:
+    elif  user_sessions[session_id].type == 3:
         archivo = "\\referencias\\arbol_BST_disc.py"
-    elif  actual.type == 8:
+    elif  user_sessions[session_id].type == 8:
         archivo = "\\referencias\\arbol_RBT_disc.py"
     else:
         archivo = "\\referencias\grafo_disc.py"
 
+
     spec = importlib.util.spec_from_file_location("",  cf.data_dir + archivo)
     foo = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(foo)
-    actual.file = foo
+
+    user_sessions[session_id].file = foo
+
     return '',200
 
 @request_blueprint.route('/config/restart', methods= ['POST'])
 def restart():
-    actual.data = None
-    actual.file = None
-    actual.estructura = None
-    actual.type = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id]= Actual(None,None,None,None)
+
     return '',200
 
 
@@ -76,12 +128,21 @@ def restart():
 #Listas Enlazadas
 @request_blueprint.route('/listas/crearVacio', methods= ['GET'])
 def crearListaVacia():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
+    user_sessions[session_id].estructura = None
+    
     try:
-        respuesta = crearListaEnlazada(actual.type, actual.file, "Vacia")
+        respuesta = crearListaEnlazada(user_sessions[session_id].type, user_sessions[session_id].file, "Vacia")
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -93,7 +154,15 @@ def crearListaVacia():
 
 @request_blueprint.route('/listas/crearEstatica', methods= ['GET'])
 def crearListaEstatica():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
+    user_sessions[session_id].estructura = None
     try:
         name = 'creation files/lista_enlazada_1.json'
         json_data = open(name)
@@ -103,10 +172,10 @@ def crearListaEstatica():
         e = "\tProblema al cargar el archivo estatico " + name
         raise DefaultError(str(e))
     try:               
-        respuesta = crearListaEnlazada(actual.type, actual.file, "Estática", data)
+        respuesta = crearListaEnlazada(user_sessions[session_id].type, user_sessions[session_id].file, "Estática", data)
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -142,14 +211,23 @@ def crearListaRandom():
 
 @request_blueprint.route('/listas/crearRandom', methods=['GET'])
 def crearListaRandom():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
+    user_sessions[session_id].estructura = None
+
     init = "Random"
     try:
-        respuesta = crearListaEnlazada(actual.type, actual.file, init)
+        respuesta = crearListaEnlazada(user_sessions[session_id].type, user_sessions[session_id].file, init)
     except Exception as e:
         raise DefaultError(str(e))
     
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     # Obtener la información adicional
     info = respuesta[2]
     # Convertir la imagen SVG a una cadena
@@ -166,6 +244,14 @@ def crearListaRandom():
 
 @request_blueprint.route('/listas/AñadirNodo', methods= ['POST'])
 def añadirNodoLista():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -175,19 +261,19 @@ def añadirNodoLista():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([1,2], actual.type)
+                state, comment = validarEstructura([1,2], user_sessions[session_id].type)
                 if not state:
                         print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = anadirNodoLista(actual.estructura, actual.type, data)
+                respuesta = anadirNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -200,6 +286,14 @@ def añadirNodoLista():
 
 @request_blueprint.route('/listas/AñadirPrincipio', methods= ['POST'])
 def añadirNodoPrincipio():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -209,19 +303,19 @@ def añadirNodoPrincipio():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([1,2], actual.type)
+                state, comment = validarEstructura([1,2], user_sessions[session_id].type)
                 if not state:
                         print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = anadirNodoListaFirst(actual.estructura, actual.type, data)
+                respuesta = anadirNodoListaFirst(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -234,6 +328,14 @@ def añadirNodoPrincipio():
 
 @request_blueprint.route('/listas/EliminarNodo', methods= ['POST'])
 def eliminarNodo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -243,19 +345,19 @@ def eliminarNodo():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([1,2], actual.type)
+                state, comment = validarEstructura([1,2], user_sessions[session_id].type)
                 if not state:
                         print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = eliminarNodoLista(actual.estructura, actual.type, data)
+                respuesta = eliminarNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     # Establecer los encabezados con la información adicional
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -268,6 +370,14 @@ def eliminarNodo():
 
 @request_blueprint.route('/listas/EncontarNodo', methods= ['POST'])
 def encontrarNodo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -277,19 +387,19 @@ def encontrarNodo():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([1,2], actual.type)
+                state, comment = validarEstructura([1,2], user_sessions[session_id].type)
                 if not state:
                         print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = encontrarNodoLista(actual.estructura, actual.type, data)
+                respuesta = encontrarNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
     
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -302,6 +412,14 @@ def encontrarNodo():
 
 @request_blueprint.route('/listas/EncontarAdyacentes', methods= ['POST'])
 def encontrarAdyacentes():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -311,19 +429,19 @@ def encontrarAdyacentes():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([1,2], actual.type)
+                state, comment = validarEstructura([1,2], user_sessions[session_id].type)
                 if not state:
                         print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = findAdjacentNodeLista(actual.estructura, actual.type, data)
+                respuesta = findAdjacentNodeLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -339,21 +457,28 @@ def encontrarAdyacentes():
 @request_blueprint.route('/listas/EncontrarTodos', methods= ['GET'])
 def encontrarTodos():
     
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     try:
         try:
-            if actual.estructura == None:
+            if user_sessions[session_id].estructura == None:
                 raise DefaultError("La estructura no ha sido creada correctamente")
-            state, comment = validarEstructura([1,2], actual.type)
+            state, comment = validarEstructura([1,2], user_sessions[session_id].type)
             if not state:
                 print(comment)
         except:
             raise DefaultError("La estructura no ha sido creada correctamente")
         if state:
-            respuesta = darTodosLosNodos(actual.estructura, actual.type)
+            respuesta = darTodosLosNodos(user_sessions[session_id].estructura, user_sessions[session_id].type)
     except Exception as e:
         raise DefaultError(str(e))
 
-    actual.estructura = respuesta[0]
+    user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -367,16 +492,24 @@ def encontrarTodos():
 
 @request_blueprint.route('/arboles/crearRandom', methods= ['GET'])
 def crearArbolRandom():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
     init = "Random"
     try:
-        if actual.type == 3:
-            respuesta = crearBST(init, actual.file)
+        if user_sessions[session_id].type == 3:
+            respuesta = crearBST(init, user_sessions[session_id].file)
         else:
-            respuesta = crearRBT(init, actual.file)
+            respuesta = crearRBT(init, user_sessions[session_id].file)
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
     # Convertir la imagen SVG a una cadena
@@ -391,7 +524,15 @@ def crearArbolRandom():
 
 @request_blueprint.route('/arboles/crearEstatico', methods= ['GET'])
 def crearArbolEstatico():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
     try:
         name = 'creation files/bst_1.json'
         json_data = open(name)
@@ -402,15 +543,15 @@ def crearArbolEstatico():
         raise DefaultError(str(e))
     
     try:  
-        if actual.type == 3:
-            respuesta = crearBST("Estática", actual.file, data)
+        if user_sessions[session_id].type == 3:
+            respuesta = crearBST("Estática", user_sessions[session_id].file, data)
         else:
-            respuesta = crearRBT("Estática", actual.file, data)
+            respuesta = crearRBT("Estática", user_sessions[session_id].file, data)
 
     except Exception as e:
         print(e)
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -431,16 +572,24 @@ def crearArbolEstatico():
 
 @request_blueprint.route('/arboles/crearVacio', methods= ['GET'])
 def crearArbolVacio():
-    actual.estructura = None
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
+
     try:
-        if actual.type == 3:
-            respuesta = crearBST("Vacia", actual.file)
+        if user_sessions[session_id].type == 3:
+            respuesta = crearBST("Vacia", user_sessions[session_id].file)
         else:
-            respuesta = crearRBT("Vacia", actual.file)
+            respuesta = crearRBT("Vacia", user_sessions[session_id].file)
     
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -457,6 +606,14 @@ def crearArbolArchivo():
 
 @request_blueprint.route('/arboles/añadirNodo', methods= ['POST'])
 def AñadirNodoArbol():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -466,22 +623,22 @@ def AñadirNodoArbol():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([3,8], actual.type)
+                state, comment = validarEstructura([3,8], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                if actual.type == 3:
-                    respuesta = anadirNodoBST(actual.estructura, data)
+                if user_sessions[session_id].type == 3:
+                    respuesta = anadirNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = anadirNodoRBT(actual.estructura, data)
+                    respuesta = anadirNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -494,6 +651,14 @@ def AñadirNodoArbol():
 
 @request_blueprint.route('/arboles/eliminarNodo', methods= ['POST'])
 def EliminarNodoArbol():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -503,22 +668,22 @@ def EliminarNodoArbol():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([3,8], actual.type)
+                state, comment = validarEstructura([3,8], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                if actual.type == 3:
-                    respuesta = eliminarNodoBST(actual.estructura, data)
+                if user_sessions[session_id].type == 3:
+                    respuesta = eliminarNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = eliminarNodoRBT(actual.estructura, data)
+                    respuesta = eliminarNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -530,6 +695,14 @@ def EliminarNodoArbol():
 
 @request_blueprint.route('/arboles/encontrarNodo', methods= ['POST'])
 def EncontrarNodoArbol():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -539,22 +712,22 @@ def EncontrarNodoArbol():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([3,8], actual.type)
+                state, comment = validarEstructura([3,8], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                if actual.type == 3:
-                    respuesta = encontrarNodoBST(actual.estructura, data)
+                if user_sessions[session_id].type == 3:
+                    respuesta = encontrarNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = encontrarNodoRBT(actual.estructura, data)
+                    respuesta = encontrarNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -566,6 +739,14 @@ def EncontrarNodoArbol():
 
 @request_blueprint.route('/arboles/encontrarAdyacentes', methods= ['POST'])
 def EncontrarAdyacentesArbol():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -575,22 +756,22 @@ def EncontrarAdyacentesArbol():
             except:
                 data = value
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([3,8], actual.type)
+                state, comment = validarEstructura([3,8], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                if actual.type == 3:
-                    respuesta = findAdjacentNodoBST(actual.estructura, data)
+                if user_sessions[session_id].type == 3:
+                    respuesta = findAdjacentNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = findAdjacentNodoRBT(actual.estructura, data)
+                    respuesta = findAdjacentNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -602,23 +783,31 @@ def EncontrarAdyacentesArbol():
 
 @request_blueprint.route('/arboles/nodos', methods= ['POST'])
 def NodosArbol():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
     json = request.get_json()
     order= json.get('order')
     try:
-        if actual.estructura == None:
+        if user_sessions[session_id].estructura == None:
             raise DefaultError("La estructura no ha sido creada correctamente")
-        state, comment = validarEstructura([3,8], actual.type)
+        state, comment = validarEstructura([3,8], user_sessions[session_id].type)
         if not state:
             print(comment)
         if state:
-            if actual.type == 3:
-                respuesta = listarNodosBST(actual.estructura, order)
+            if user_sessions[session_id].type == 3:
+                respuesta = listarNodosBST(user_sessions[session_id].estructura, order)
             else:
-                respuesta = listarNodosRBT(actual.estructura, order)
+                respuesta = listarNodosRBT(user_sessions[session_id].estructura, order)
     except Exception as e:
         raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -631,13 +820,22 @@ def NodosArbol():
 
 @request_blueprint.route('/grafos/crearRandom', methods= ['GET'])
 def crearGrafoRandom():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
+
     init = "Random"
     try:
-        respuesta = crearGraph(init, actual.type ,actual.file, labels=True)
+        respuesta = crearGraph(init, user_sessions[session_id].type ,user_sessions[session_id].file, labels=True)
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
     # Convertir la imagen SVG a una cadena
@@ -652,13 +850,22 @@ def crearGrafoRandom():
 
 @request_blueprint.route('/grafos/crearVacio', methods= ['GET'])
 def crearGrafoVacio():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
+
     init = "Vacio"
     try:
-        respuesta = crearGraph(init, actual.type ,actual.file, labels=True)
+        respuesta = crearGraph(init, user_sessions[session_id].type ,user_sessions[session_id].file, labels=True)
     except Exception as e:
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
     # Convertir la imagen SVG a una cadena
@@ -673,7 +880,15 @@ def crearGrafoVacio():
 
 @request_blueprint.route('/grafos/crearEstatico', methods= ['GET'])
 def crearGrafoEstatico():
-    actual.estructura = None
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
+    user_sessions[session_id].estructura = None
     try:
         name = 'creation files/graph_1.json'
         json_data = open(name)
@@ -683,10 +898,11 @@ def crearGrafoEstatico():
         e = "\tProblema al cargar el archivo estatico " + name
         raise DefaultError(str(e))
     try:  
-        respuesta = crearGraph("Estática", actual.type ,actual.file,data,labels=True)
+        respuesta = crearGraph("Estática", user_sessions[session_id].type ,user_sessions[session_id].file,data,labels=True)
     except Exception as e:
+        print(e)
         raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -713,24 +929,32 @@ def crearGrafosArchivo():
 
 @request_blueprint.route('/grafos/añadirNodo', methods= ['POST'])
 def AñadirNodoGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
-                    print(actual.type ,state, comment)
+                    print(user_sessions[session_id].type ,state, comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = anadirNodoGraph(actual.estructura, actual.type, True, value)    
+                respuesta = anadirNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -742,24 +966,32 @@ def AñadirNodoGrafo():
 
 @request_blueprint.route('/grafos/eliminarNodo', methods= ['POST'])
 def EliminarNodoGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = eliminarNodoGraph(actual.estructura, actual.type, True, value)    
+                respuesta = eliminarNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -771,24 +1003,32 @@ def EliminarNodoGrafo():
 
 @request_blueprint.route('/grafos/encontrarNodo', methods= ['POST'])
 def EncontrarNodoGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = existeNodoGraph(actual.estructura, actual.type, True, value)    
+                respuesta = existeNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -800,6 +1040,14 @@ def EncontrarNodoGrafo():
 
 @request_blueprint.route('/grafos/añadirArco', methods= ['POST'])
 def AñadirArco():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     origen = json.get('origen').strip()
     destino = json.get('destino').strip()
@@ -807,19 +1055,19 @@ def AñadirArco():
     if len(origen) > 0 and len(destino)>0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = anadirArcoGraph(actual.estructura, actual.type, True, origen, destino, peso)    
+                respuesta = anadirArcoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, origen, destino, peso)    
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -831,24 +1079,32 @@ def AñadirArco():
 
 @request_blueprint.route('/grafos/encontrarAdyacents', methods= ['POST'])
 def encontrarAdyacentesGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
                 raise DefaultError("La estructura no ha sido creada correctamente")
             if state:
-                respuesta = adyacentesNodoGraph(actual.estructura, actual.type, True, value)    
+                respuesta = adyacentesNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -858,23 +1114,32 @@ def encontrarAdyacentesGrafo():
     }
     return jsonify(response_data),200
 
-@request_blueprint.route('/grafos/todosNodos', methods= ['GET'])
+@request_blueprint.route('/grafos/encontrarTodos', methods= ['GET'])
 def NodosGrafo():
+
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
     try:
         try:
-            if actual.estructura == None:
+            if user_sessions[session_id].estructura == None:
                 raise DefaultError("La estructura no ha sido creada correctamente")
-            state, comment = validarEstructura([4,7], actual.type)
+            state, comment = validarEstructura([4,7], user_sessions[session_id].type)
             if not state:
                 print(comment)
         except:
             raise DefaultError("La estructura no ha sido creada correctamente")
         if state:
-            respuesta = encontrarNodosGraph(actual.estructura, actual.type, True)    
+            respuesta = encontrarNodosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True)    
     except Exception as e:
         raise DefaultError(str(e))
 
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -887,15 +1152,23 @@ def NodosGrafo():
 
 @request_blueprint.route('/grafos/recorridos', methods= ['POST'])
 def recorridosGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+
     json = request.get_json()
     nodo = json.get('vertice').strip()
     recorrido = json.get('recorrido')
     if len(nodo) > 0:
         try:
             try:
-                if actual.estructura == None:
+                if user_sessions[session_id].estructura == None:
                     raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], actual.type)
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
                 if not state:
                     print(comment)
             except:
@@ -903,12 +1176,12 @@ def recorridosGrafo():
             if state:
                 if '*' in recorrido and len(nodo) > 0:
                     recorrido = recorrido.replace('*', '')
-                    respuesta = recorridosGraph(actual.estructura, actual.type, True, recorrido, nodo)
+                    respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido, nodo)
                 else:
-                    respuesta = recorridosGraph(actual.estructura, actual.type, True, recorrido, nodo)  
+                    respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido, nodo)  
         except Exception as e:
             raise DefaultError(str(e))
-    actual.estructura = respuesta[1]
+    user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
