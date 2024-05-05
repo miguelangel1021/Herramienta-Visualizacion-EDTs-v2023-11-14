@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from models.model import Actual
 from flask import jsonify, request, Blueprint, Response, make_response
 import importlib
@@ -11,6 +12,7 @@ from errors.errors import DefaultError, IdNotInRequest, ExpiredSessionId
 from io import BytesIO
 import base64
 import uuid
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 
@@ -27,6 +29,7 @@ def create_session():
     # Crear una nueva estructura de datos de sesión para este Session-Id
     user_sessions[session_id] = Actual(None, None, None, None)
 
+    user_sessions[session_id].lastAccesTime = datetime.now()
     # Devolver el Session-Id
     response = make_response(jsonify({'session_id': session_id}), 200)
 
@@ -44,6 +47,8 @@ def asignarEstructura():
     
     if session_id not in user_sessions:
         user_sessions[session_id] = Actual(None, None, None, None)
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     
     json = request.get_json()
     user_sessions[session_id].type = json.get('type')
@@ -71,7 +76,8 @@ def cargarArchvio():
         exec(file_content, foo.__dict__)
     except Exception as e:
         raise DefaultError(e)
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].file = foo
 
     return '',200
@@ -87,6 +93,8 @@ def cargarArchvioPorDefecto():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     
     json = request.get_json()
     user_sessions[session_id].type = json.get('type')
@@ -118,8 +126,11 @@ def restart():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
+    
+    
 
     user_sessions[session_id]= Actual(None,None,None,None)
+    user_sessions[session_id].lastAccesTime = datetime.now()
 
     return '',200
 
@@ -136,6 +147,7 @@ def crearListaVacia():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
     
     try:
@@ -162,6 +174,7 @@ def crearListaEstatica():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
     try:
         name = 'creation files/lista_enlazada_1.json'
@@ -219,6 +232,7 @@ def crearListaRandom():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
 
     init = "Random"
@@ -251,7 +265,8 @@ def añadirNodoLista():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -294,6 +309,7 @@ def añadirNodoPrincipio():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -335,6 +351,8 @@ def eliminarNodo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
 
     json = request.get_json()
     value = json.get('value').strip()
@@ -377,7 +395,8 @@ def encontrarNodo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -419,7 +438,8 @@ def encontrarAdyacentes():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -463,7 +483,8 @@ def encontrarTodos():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     try:
         try:
             if user_sessions[session_id].estructura == None:
@@ -499,7 +520,8 @@ def crearArbolRandom():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
     init = "Random"
     try:
@@ -531,8 +553,10 @@ def crearArbolEstatico():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
+
     try:
         name = 'creation files/bst_1.json'
         json_data = open(name)
@@ -578,7 +602,8 @@ def crearArbolVacio():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
 
     try:
@@ -613,7 +638,8 @@ def AñadirNodoArbol():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -658,7 +684,8 @@ def EliminarNodoArbol():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -702,7 +729,8 @@ def EncontrarNodoArbol():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -746,7 +774,8 @@ def EncontrarAdyacentesArbol():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -791,6 +820,8 @@ def NodosArbol():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
+    
     json = request.get_json()
     order= json.get('order')
     try:
@@ -827,7 +858,8 @@ def crearGrafoRandom():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
 
     init = "Random"
@@ -857,7 +889,8 @@ def crearGrafoVacio():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
 
     init = "Vacio"
@@ -887,7 +920,8 @@ def crearGrafoEstatico():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     user_sessions[session_id].estructura = None
     try:
         name = 'creation files/graph_1.json'
@@ -936,7 +970,8 @@ def AñadirNodoGrafo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-    
+    user_sessions[session_id].lastAccesTime = datetime.now()
+
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -973,7 +1008,8 @@ def EliminarNodoGrafo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -1010,7 +1046,8 @@ def EncontrarNodoGrafo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -1047,7 +1084,8 @@ def AñadirArco():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     origen = json.get('origen').strip()
     destino = json.get('destino').strip()
@@ -1086,7 +1124,8 @@ def encontrarAdyacentesGrafo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     value = json.get('value').strip()
     if len(value) > 0:
@@ -1125,6 +1164,7 @@ def NodosGrafo():
     if session_id not in user_sessions:
         raise ExpiredSessionId
     
+    user_sessions[session_id].lastAccesTime = datetime.now()
     try:
         try:
             if user_sessions[session_id].estructura == None:
@@ -1159,7 +1199,8 @@ def recorridosGrafo():
     
     if session_id not in user_sessions:
         raise ExpiredSessionId
-
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
     json = request.get_json()
     nodo = json.get('vertice').strip()
     recorrido = json.get('recorrido')
@@ -1190,3 +1231,32 @@ def recorridosGrafo():
         'info': info
     }
     return jsonify(response_data),200
+
+
+
+def clean_inactive_sessions():
+    now = datetime.now()
+    inactive_threshold = timedelta(minutes=10)
+
+    sessions_to_remove = []
+    for session_id, session_data in user_sessions.items():
+        last_access_time = session_data.lastAccesTime
+        if (now - last_access_time) > inactive_threshold:
+            sessions_to_remove.append(session_id)
+
+    for session_id in sessions_to_remove:
+        del user_sessions[session_id]
+        print("eliminado: "+(session_id))
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(clean_inactive_sessions, 'interval', minutes=5)  # Ejecutar cada 5 minutos
+scheduler.start()
+
+
+@request_blueprint.route('/verificar', methods= ['GET'])
+def verificar():
+    sessions = []
+    for session_id, session_data in user_sessions.items():
+            sessions.append(session_id)
+    return jsonify(sessions), 200
