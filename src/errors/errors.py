@@ -16,10 +16,10 @@ class DefaultError(ApiError):
         self.description = description
 
 
-class IdNotInRequest(Exception):
+class IdNotInRequest(ApiError):
     code = 401
     description = "El Session Id no esta en el request"
 
-class ExpiredSessionId(Exception):
+class ExpiredSessionId(ApiError):
     code = 402
     description = "El Session-Id a expirado, ingrese nuevamente"
