@@ -474,34 +474,78 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment: mensaje informativo para el usuario
         
     '''
-    state_val = ''
+    state_val = 'SUCCESSFUL'
     comment = ''
     posError = ' '
     nodos = estructura.getNodeValues()
     edges = estructura.getEdgeValues()
+    flecha = ''
     # Inicializacion de la estructura
     if tipo == 4:
         structure_ref = referenciaGrafo('Directed')
+        flecha = " --> "
     else:
         structure_ref = referenciaGrafo()
+        flecha = " <--> "
     for i in nodos:                     
         structure_ref.addNode_byValue(i)
     for i,j,k in edges:
         structure_ref.addEdge_byValue(i,j,k)  
     # ---
     
-    # Aplicar el recorrido
+    # Aplicar el recorrido(
     result_ref = structure_ref.algorithms(recorrido, nodo)
     refText = ''
     testText = ''
+    validacion = ''
     if tipo_inData == 'lista_nodos':
         if recorrido == "DepthFirstSearch" or recorrido == 'BreadhtFirstSearch':
+            #Texto de vertices resultado
+            result_ref[1]= sorted(result_ref[1])
+            result_test[1]= sorted(result_test[1])
             for i in result_ref[1]:
                 refText = refText + str(i) + ', '
-            for i in result_test:
+            for i in result_test[1]:
                 testText = testText + str(i) + ', ' 
             refText = refText[:-2]     
-            testText = testText[:-2] 
+            testText = testText[:-2]
+
+            vertices_test = result_test[1]
+            vertices_ref = result_ref[1]
+            #Validación de vertices
+            if len(vertices_ref) != len(vertices_test):
+                state_val = "FAILED"
+                validacion = "El numero de vertices visitados en el recorido no es el esperado. \n"
+            if vertices_ref != vertices_test:
+                state_val = "FAILED"
+                validacion += "Los vertices obtenidos son distintos a los esperados\n"
+
+            if state_val == "FAILED":
+                for i in vertices_test: 
+                    if i not in vertices_ref:
+                        state_val = "FAILED"
+                        validacion+= "El vertice " +str(i)+" no debería aparecer en el recorrido. \n"
+
+                validacion += "Vertices esperados:  "+refText+"\n"
+                validacion += "Vertices obtenidos:  "+refText+"\n"
+            #Validación de arcos
+            if len(result_ref[0]) != len(result_test[0]):
+                state_val = "FAILED"
+                validacion = "El numero de arcos en el recorido no es el esperado. \n"
+            arcos = ''
+            for arco in result_test[0]:
+                arcos= arcos + str(arco[0])+flecha+str(arco[1])+" \n"
+                if arco not in result_ref[0]:
+                    state_val = "FAILED"
+                    validacion+= "El arco " +str(arco[0])+flecha+str(arco[1])+" no debería aparecer en el recorrido. \n"
+            
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+            comment += "Vertices del recorrido:  "+testText+"\n"
+            comment += "Arcos del recorrido: \n"
+            comment+= arcos
+            if state_val == "FAILED":
+                comment += validacion
+
         elif recorrido == 'DepthFirstOrder':
             depthFirstOrderRefText = False
             dfoList = ""
@@ -530,7 +574,16 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             for i in result_test:
                 testText = testText + str(i) + ', ' 
             refText = refText[:-2]     
-            testText = testText[:-2]    
+            testText = testText[:-2]
+
+        if nodo != None:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+        else:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
+        if posError != " ":
+            comment = posError
+        else:
+            comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText    
     
     if tipo_inData == 'tupla':
         testEdges = result_test[0]
@@ -546,6 +599,15 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         
         refText = refText[:-2] + '\n  COSTO: ' + str(refWeight) + '\n'
         testText = testText[:-2] + '\n  COSTO: ' + str(testWeight)
+
+        if nodo != None:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+        else:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
+        if posError != " ":
+            comment = posError
+        else:
+            comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText
         
         
         
@@ -555,7 +617,16 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         for i in result_test:
             testText = testText + '(' + i[0] + '->' + i[1] + '), '
         refText = refText[:-2]     
-        testText = testText[:-2]    
+        testText = testText[:-2]
+
+        if nodo != None:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+        else:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
+        if posError != " ":
+            comment = posError
+        else:
+            comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText    
     
     if tipo_inData == 'dicts':
         a = dict()
@@ -579,6 +650,14 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                 if i==x and y==j:
                     if a[x,y] != b[i,j]:
                         posError = 'Hay un error en la definicion del origen del nodo'
+        if nodo != None:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+        else:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
+        if posError != " ":
+            comment = posError
+        else:
+            comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText
         
 
     if tipo_inData == 'single_dict':
@@ -593,8 +672,17 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             for i in lista:
                 testText = testText + i + ', '
             testText = testText[:-2]
+        
+        if nodo != None:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+        else:
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
+        if posError != " ":
+            comment = posError
+        else:
+            comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText
                 
-    if nodo != None:
+    """if nodo != None:
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
     else:
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado:'
@@ -602,5 +690,6 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment = posError
     else:
         comment = comment + '\n '+ posError +'\n Respuesta: \n' + refText
-    #comment = comment + '\n\nSe obtuvo: ' + testText    
+    #comment = comment + '\n\nSe obtuvo: ' + testText    """
+    
     return state_val, comment

@@ -531,7 +531,7 @@ def recorridosGraph(estructura, tipo, label, recorrido, nodo=None):
             rut = rtaRecorrido[1]
             rut.remove(nodo)
             edges = rtaRecorrido[0]
-            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rut, nodo)
+            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
    #         rtaRecorrido.remove(nodo)
             dis = displayGraph(estructura, tipo, label, nodosX=rut, nodeY=nodo,  edgesX=edges)
         elif  recorrido == 'BreadhtFirstSearch':
@@ -577,8 +577,6 @@ def recorridosGraph(estructura, tipo, label, recorrido, nodo=None):
     info = {'Operacion': 'Recorrido',
             'Algoritmo': recorrido,
             'state': state_val,
-            'comment': comment,
-            "Vertices": rtaRecorrido[1],
-            "Arcos": rtaRecorrido[0]}
+            'comment': comment}
     
     return dis,estructura,info
