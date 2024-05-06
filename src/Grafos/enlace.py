@@ -577,6 +577,8 @@ def recorridosGraph(estructura, tipo, label, recorrido, nodo=None):
     info = {'Operacion': 'Recorrido',
             'Algoritmo': recorrido,
             'state': state_val,
-            'comment': comment}
+            'comment': comment,
+            "Vertices": rtaRecorrido[1],
+            "Arcos": rtaRecorrido[0]}
     
     return dis,estructura,info
