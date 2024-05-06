@@ -1204,24 +1204,25 @@ def recorridosGrafo():
     json = request.get_json()
     nodo = json.get('vertice').strip()
     recorrido = json.get('recorrido')
-    if len(nodo) > 0:
+    try:
         try:
-            try:
-                if user_sessions[session_id].estructura == None:
-                    raise DefaultError("La estructura no ha sido creada correctamente")
-                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
-                if not state:
-                    print(comment)
-            except:
+            if user_sessions[session_id].estructura == None:
                 raise DefaultError("La estructura no ha sido creada correctamente")
-            if state:
-                if '*' in recorrido and len(nodo) > 0:
-                    recorrido = recorrido.replace('*', '')
-                    respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido, nodo)
-                else:
-                    respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido, nodo)  
-        except Exception as e:
-            raise DefaultError(str(e))
+            state, comment = validarEstructura([4,7], user_sessions[session_id].type)
+            if not state:
+                print(comment)
+        except:
+            raise DefaultError("La estructura no ha sido creada correctamente")
+        if state:
+            if '*' in recorrido and len(nodo) > 0:
+                recorrido = recorrido.replace('*', '')
+                respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido, nodo)
+            elif '*' in recorrido:
+                raise DefaultError("Ingrese un nodo de partida para ejecutar el recorrido.")
+            else:
+                 respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido)  
+    except Exception as e:
+        raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')

@@ -18,8 +18,8 @@ class DefaultError(ApiError):
 
 class IdNotInRequest(ApiError):
     code = 401
-    description = "El Session Id no esta en el request"
+    description = "El id de la seson no existe, por favor intente de nuevo"
 
 class ExpiredSessionId(ApiError):
     code = 402
-    description = "El Session-Id a expirado, ingrese nuevamente"
+    description = "Su sesión a expirado, ingrese nuevamente."
