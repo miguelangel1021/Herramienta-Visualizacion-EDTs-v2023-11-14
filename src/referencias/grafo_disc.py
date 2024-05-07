@@ -300,17 +300,21 @@ class grafo:
         if algoritmo == 'DepthFirstOrder':
             search = dfo.DepthFirstOrder(self.estructura)
             table.append('Pre')
+            pre = []
             while not stack.isEmpty(search['pre']):
                 top = stack.pop(search['pre'])
-                table.append(top)
+                pre.append(top)
             table.append('Post')
+            post = []
             while not stack.isEmpty(search['post']):
                 top = stack.pop(search['post'])
-                table.append(top)
+                post.append(top)
             table.append('Reverse')
+            reverse=[]
             while not stack.isEmpty(search['reversepost']):
                 top = stack.pop(search['reversepost'])
-                table.append(top)
+                reverse.append(top)
+            return (pre, post, reverse)
 
         if algoritmo == 'PrimMST':
             search = prim.initSearch(self.estructura)

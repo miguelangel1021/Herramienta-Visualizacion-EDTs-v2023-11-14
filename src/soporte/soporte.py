@@ -29,7 +29,7 @@ def checkAlgoritmGraph(type, recorrido):
     if recorrido in both:
         result = True
     elif recorrido == 'PrimMST':
-        result = type == 5
+        result = type == 5 or type == 7
         comment = 'ERROR: ' + recorrido + ' solo se puede aplicar a Grafos No Dirigidos'
     elif recorrido == 'KosarajuSCC' or recorrido == 'DirectedCycle':
         result = type == 4

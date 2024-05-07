@@ -538,7 +538,7 @@ def recorridosGraph(estructura, tipo, label, recorrido, nodo=None):
             rut = rtaRecorrido[1]
             rut.remove(nodo)
             edges = rtaRecorrido[0]
-            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rut, nodo)
+            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
             dis = displayGraph(estructura, tipo, label, nodosX=rut, nodeY=nodo,edgesX=edges)
         else:
             state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
