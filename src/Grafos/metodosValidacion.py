@@ -504,8 +504,8 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             testText = ''
             validacion = ''
             #Texto de vertices resultado
-            result_ref[1]= sorted(result_ref[1])
-            result_test[1]= sorted(result_test[1])
+            result_ref= (result_ref[0],sorted(result_ref[1]))
+            result_test= (result_test[0],sorted(result_test[1]))
             for i in result_ref[1]:
                 refText = refText + str(i) + ', '
             for i in result_test[1]:
@@ -566,11 +566,11 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
 
 
             if len(ref_pre) == len(test_pre):
-                for i in range(len(test_pre)):
+                for i in range(0,len(test_pre)):
                     if test_pre[i] != ref_pre[i]:
                         sameOrder = False
-                        pre_text_test = pre_text_test + str(test_pre[i]) + ", "
-                        pre_text_ref = pre_text_ref + str(ref_pre[i]) + ", "
+                    pre_text_test = pre_text_test + str(test_pre[i]) + ", "
+                    pre_text_ref = pre_text_ref + str(ref_pre[i]) + ", "
 
                 pre_text_test = pre_text_test[:-2]     
                 pre_text_ref = pre_text_ref[:-2]
@@ -581,17 +581,17 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                     validacion += "se obtuvo: " + pre_text_test[5:] + "\n"
             else:
                 state_val = VALIDATION_STATES[-1]
-                for i in range(len(test_pre)):
+                for i in range(0,len(test_pre)):
                     pre_text_test = pre_text_test + str(test_pre[i]) + ", "
-                for i in range(len(ref_pre)):
+                for i in range(0,len(ref_pre)):
                     pre_text_ref = pre_text_ref + str(ref_pre[i]) + ", "
 
                 pre_text_test = pre_text_test[:-2]     
                 pre_text_ref = pre_text_ref[:-2]
-                if not sameOrder:
-                    validacion += "El orden de los elementos de la cola Pre no es el esperado. \n"
-                    validacion += "se esperaba: " + pre_text_ref[5:] + "\n"
-                    validacion += "se obtuvo: " + pre_text_test[5:] + "\n"
+                
+                validacion += "Faltan elementos en la cola Pre. \n"
+                validacion += "se esperaba: " + pre_text_ref[5:] + "\n"
+                validacion += "se obtuvo: " + pre_text_test[5:] + "\n"
             
 
             #Validacion cola post
@@ -601,11 +601,11 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
 
             
             if len(ref_post) == len(test_post):
-                for i in range(len(test_post)):
+                for i in range(0,len(test_post)):
                     if test_post[i] != ref_post[i]:
                         sameOrder = False
-                        post_text_test = post_text_test + str(test_post[i]) + ", "
-                        post_text_ref = post_text_ref + str(ref_post[i]) + ", "
+                    post_text_test = post_text_test + str(test_post[i]) + ", "
+                    post_text_ref = post_text_ref + str(ref_post[i]) + ", "
 
                 post_text_test = post_text_test[:-2]     
                 post_text_ref = post_text_ref[:-2]
@@ -616,32 +616,36 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                     validacion += "Se obtuvo: " + post_text_test[6:] + "\n"
             else:
                 state_val = VALIDATION_STATES[-1]
-                for i in range(len(test_post)):
+                for i in range(0,len(test_post)):
                     post_text_test = post_text_test + str(test_post[i]) + ", "
-                for i in range(len(ref_post)):
+                for i in range(0,len(ref_post)):
                     post_text_ref = post_text_ref + str(ref_post[i]) + ", "
 
                 post_text_test = post_text_test[:-2]     
                 post_text_ref = post_text_ref[:-2]
-                if not sameOrder:
-                    validacion += "El orden de los elementos de la cola Post no es el esperado. \n"
-                    validacion += "Se esperaba: " + post_text_ref[6:] + "\n"
-                    validacion += "Se obtuvo: " + post_text_test[6:] + "\n"
+                
+                validacion += "Faltan elementos en la cola Post. \n"
+                validacion += "Se esperaba: " + post_text_ref[6:] + "\n"
+                validacion += "Se obtuvo: " + post_text_test[6:] + "\n"
             
             #Validacion pila reverse
-            reverse_text_test = 'Reverse: '
-            reverse_text_ref = 'Reverse: '
+            reverse_text_test = ''
+            reverse_text_ref = ''
             sameOrder = True
 
             if len(ref_reverse) == len(test_reverse):
-                for i in range(len(test_reverse)):
+                for i in range(0,len(test_reverse)):
                     if test_reverse[i] != ref_reverse[i]:
                         sameOrder = False
-                        reverse_text_test = reverse_text_test + str(test_reverse[i]) + ", "
-                        reverse_text_ref = reverse_text_ref + str(ref_reverse[i]) + ", "
-
+                    reverse_text_test = str(test_reverse[i]) +  ", " + reverse_text_test
+                    reverse_text_ref = str(ref_reverse[i]) + ", "+ reverse_text_ref 
+                
                 reverse_text_test = reverse_text_test[:-2]     
                 reverse_text_ref = reverse_text_ref[:-2]
+
+                reverse_text_test = 'Reverse: '+reverse_text_test
+                reverse_text_ref = 'Reverse: '+reverse_text_ref
+
                 if not sameOrder:
                     state_val = VALIDATION_STATES[-1]
                     validacion += "El orden de los elementos de la pila Reverse no es el esperado. \n"
@@ -649,19 +653,22 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                     validacion += "se obtuvo: " + reverse_text_test[9:] + "\n"
             else:
                 state_val = VALIDATION_STATES[-1]
-                for i in range(len(test_reverse)):
-                    reverse_text_test = reverse_text_test + str(test_reverse[i]) + ", "
-                for i in range(len(ref_reverse)):
-                    reverse_text_ref = reverse_text_ref + str(ref_reverse[i]) + ", "
+                for i in range(0,len(test_reverse)):
+                    reverse_text_test = str(test_reverse[i]) +  ", " + reverse_text_test
+                for i in range(0,len(ref_reverse)):
+                    reverse_text_ref = str(ref_reverse[i]) + ", "+ reverse_text_ref 
 
+                
                 reverse_text_test = reverse_text_test[:-2]     
-                reverse_text_test = reverse_text_test[:-2]
-                if not sameOrder:
-                    validacion += "El orden de los elementos de la pila Reverse no es el esperado. \n"
-                    validacion += "se esperaba: " + reverse_text_test[5:] + "\n"
-                    validacion += "se obtuvo: " + reverse_text_test[5:] + "\n"
+                reverse_text_ref = reverse_text_ref[:-2]
+                reverse_text_test = 'Reverse: '+reverse_text_test
+                reverse_text_ref = 'Reverse: '+reverse_text_ref
+                
+                validacion += "Faltan elementos en la pila Reverse . \n"
+                validacion += "se esperaba: " + reverse_text_ref[9:] + "\n"
+                validacion += "se obtuvo: " + reverse_text_test[9:] + "\n"
             
-            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
+            comment = 'El algoritmo ' + recorrido + ' se ha ejecutado. \n'
             comment += pre_text_test + " \n"
             comment += post_text_test + " \n"
             comment += reverse_text_test + " \n"
@@ -734,7 +741,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         a = dict()
         for aux_dict in result_ref:
             a[nodo,aux_dict['node']] = aux_dict['cost']
-            refText = refText + '\n* "'+nodo+'"' +'-->' +'"'+str(aux_dict['node'])+'"' + ' Costo: ' + str(round(aux_dict['cost']),2) + '\n  Path: '
+            refText = refText + '\n* "'+nodo+'"' +'-->' +'"'+str(aux_dict['node'])+'"' + ' Costo: ' + str(aux_dict['cost']) + '\n  Path: '
             for i,j in aux_dict['path']:
                 refText = refText + '(' + i + '->' + j + '), '
             if len(aux_dict['path'])>0:
@@ -812,12 +819,13 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             validacion+= "El numero de componentes fuertemente conectados ("+str(len(result_test.keys()))+") es mayor al esperado ("+str(len(result_ref.keys()))+") \n"
         else:
             count = 0
-            for nodos in result_test.values():
-                for nodos_ref in result_ref.values():
-                    if len(nodos) > len(nodos_ref):
-                        state_val = VALIDATION_STATES[-1]
-                        validacion += "El numero de nodos del componente "+str(count)+" es mayor al esperado.\n"
-                        break
+            nodes_test = sorted(result_test.values())
+            nodes_ref = sorted(result_ref.values())
+            for i in range(0,len(nodes_test)):
+                if len(nodes_test[i]) > len(nodes_ref[i]):
+                    state_val = VALIDATION_STATES[-1]
+                    validacion += "El numero de nodos del componente "+str(count)+" es mayor al esperado.\n"
+                    break
                 count+=1
         
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado \n'
@@ -825,9 +833,9 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment += testText + " \n"
         if state_val == VALIDATION_STATES[-1]:
             comment += validacion
-            comment +="Componentes esperados: \n"
-            comment +=refText+" \n"
-            comment +="Componentes obtenidos: \n"
+            comment +="Componentes esperados:"
+            comment +=refText+" \n \n"
+            comment +="Componentes obtenidos:"
             comment +=testText+ " \n"
                 
     return state_val, comment

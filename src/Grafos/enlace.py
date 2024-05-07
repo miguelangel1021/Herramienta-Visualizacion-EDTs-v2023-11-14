@@ -528,20 +528,21 @@ def recorridosGraph(estructura, tipo, label, recorrido, nodo=None):
     comment = ''
     if recorrido == 'DepthFirstSearch' or recorrido == 'BreadhtFirstSearch' or recorrido == 'DepthFirstOrder':
         if recorrido == 'DepthFirstSearch':
+            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
             rut = rtaRecorrido[1]
             rut.remove(nodo)
             edges = rtaRecorrido[0]
-            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
-   #         rtaRecorrido.remove(nodo)
+            #rtaRecorrido.remove(nodo)
             dis = displayGraph(estructura, tipo, label, nodosX=rut, nodeY=nodo,  edgesX=edges)
         elif  recorrido == 'BreadhtFirstSearch':
+            
+            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
             rut = rtaRecorrido[1]
             rut.remove(nodo)
             edges = rtaRecorrido[0]
-            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
             dis = displayGraph(estructura, tipo, label, nodosX=rut, nodeY=nodo,edgesX=edges)
         else:
-            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido, nodo)
+            state_val, comment = validarRecorridosGrafo(estructura, tipo, 'lista_nodos', recorrido, rtaRecorrido)
             dis = displayGraph(estructura, tipo, label)
             
     elif recorrido == 'DirectedCycle':

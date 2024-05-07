@@ -13,6 +13,7 @@ from io import BytesIO
 import base64
 import uuid
 from apscheduler.schedulers.background import BackgroundScheduler
+import traceback
 
 
 
@@ -988,7 +989,7 @@ def AñadirNodoGrafo():
                 respuesta = anadirNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -1222,6 +1223,7 @@ def recorridosGrafo():
             else:
                  respuesta = recorridosGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, recorrido)  
     except Exception as e:
+        traceback.print_exc()
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]

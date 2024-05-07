@@ -266,8 +266,9 @@ class grafo:
             for i in pathss:
                 x = i['first']
                 while x['next'] is not None:
-                    edges.append((x['info'], x['next']['info']))
-                    edges.append((x['next']['info'], x['info']))
+                    #edges.append((x['info'], x['next']['info']))
+                    if (x['next']['info'], x['info']) not in edges:
+                        edges.append((x['next']['info'], x['info']))
                     x = x['next']
             tuplesss = (edges, sorted(table))
             return tuplesss
@@ -291,8 +292,9 @@ class grafo:
             for i in pathss:
                 x = i['first']
                 while x['next'] is not None:
-                    edges.append((x['info'], x['next']['info']))
-                    edges.append((x['next']['info'], x['info']))
+                    #edges.append((x['info'], x['next']['info']))
+                    if (x['next']['info'], x['info']) not in edges:
+                        edges.append((x['next']['info'], x['info']))
                     x = x['next']
             tuplesss = (edges, sorted(table))
             return tuplesss
