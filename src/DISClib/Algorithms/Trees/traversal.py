@@ -27,6 +27,7 @@
 
 import config
 from DISClib.ADT import list as lt
+from collections import deque
 assert config
 
 
@@ -67,6 +68,15 @@ def postorder(omap):
     lst = lt.newList('SINGLE_LINKED', omap['cmpfunction'])
     if (omap is not None):
         lst = postorderTree(omap['root'], lst)
+    return lst
+
+def leveledPath(omap):
+    """
+    Implementa un recorrido postorder de un arbol binario
+    """
+    lst = lt.newList('SINGLE_LINKED', omap['cmpfunction'])
+    if (omap is not None):
+        lst = leveledPathTree(omap['root'], lst)
     return lst
 
 
@@ -115,4 +125,23 @@ def preorderTree_with_color(root, lst):
         lt.addLast(lst, [root['value'], root['color']])
         preorderTree_with_color(root['left'], lst)
         preorderTree_with_color(root['right'], lst)
+    return lst
+
+def leveledPathTree(root, lst):
+
+    if root is None:
+        return None
+    else:
+        lt.addLast
+        queue = deque()
+        queue.append(root)
+
+        while queue:
+            node = queue.popleft()
+            lt.addLast(lst, (node['value']))
+
+            if node['left'] is not None:
+                queue.append(node['left'])
+            if node['right'] is not None:
+                queue.append(node['right'])
     return lst

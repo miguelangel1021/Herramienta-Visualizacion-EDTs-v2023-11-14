@@ -395,20 +395,33 @@ def crearRBT(init, file, data={}):
     except:
         e = '\tProblema al obtener las llaves, método getNodeValues()'
         raise Exception(e)
-    state_val, comment = validar_rbt_crear(nodos, st_nodos)
+    try:
+        nodos_color = estructura.getNodeValues("Preorder_with_color")
+    except:
+        e = '\tProblema al obtener las llaves, método getNodeValues() el realizar el recorrido preorden con color'
+        raise Exception(e)
+
+    state_val, comment, end_val= validar_rbt_crear(nodos, st_nodos, nodos_color)
     
     print('Crear RBT ' + init + ':')
     print(state_val)    
     print(comment)
     #print('Altura del arbol: ', str(omap.height(estructura.estructura)))
-    print('Altura del arbol: ', str(estructura.size()))
 
-    info = {"Crear RBT": init,
+    info = {"Total llaves": str(len(nodos_color)),
+            'Crear RBT': init,
             'state': state_val,
             'comment': comment,
-            #'Altura del arbol': str(omap.height(estructura.estructura)),}
-            'Altura del arbol':  str(estructura.size()),}
-
+            'RBT Preorden': nodos_color,
+            'Size RBT': estructura.size(),
+            'Height RBT': estructura.height(),
+            'minKey RBT': estructura.minKey(),
+            'Se esperaba RBT Preorden': None,
+            'Se obtuvo RBT Preorden': None}
+    
+    if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
+        info['Se esperaba RBT Preorden'] = end_val
+        info['Se obtuvo RBT Preorden'] = nodos_color
 
     return dis, estructura, info
 
@@ -461,6 +474,24 @@ def anadirNodoRBT(estructura, nodo):
         info['Se esperaba'] = end_val
         info['Se obtuvo'] = end_test
     
+
+    info = {"Añadir llave": nodo,
+            'state': state_val,
+            'comment': comment,
+            'RBT Preorden': end_test,
+            'Size RBT': estructura.size(),
+            'Height RBT': estructura.height(),
+            'minKey RBT': estructura.minKey(),
+            'Se esperaba RBT Preorden': None,
+            'Se obtuvo RBT Preorden': None}
+
+    if state_val != VALIDATION_STATES[1]:
+        print('Se esperaba RBT Preorden:', end_val)
+        print('Se obtuvo RBT Preorden  :', end_test)
+        info['Se esperaba RBT Preorden'] = end_val
+        info['Se obtuvo RBT Preorden'] = end_test
+
+    
     return dis,estructura,info
 
 def eliminarNodoRBT(estructura, nodo):
@@ -497,20 +528,21 @@ def eliminarNodoRBT(estructura, nodo):
     print("Vertices: ", nodos)
     print('Altura del arbol: ', str(estructura.size()))
 
-
-    info = {"Eliminar elemento": nodo,
+    info = {"Eliminar Llave": nodo,
             'state': state_val,
             'comment': comment,
-            "Vertices":nodos,
-            'Altura del arbol':  str(estructura.size()),
-            'Se esperaba': None,
-            'Se obtuvo': None}
+            'RBT Preorden': end_test,
+            'Size RBT': estructura.size(),
+            'Height RBT': estructura.height(),
+            'minKey RBT': estructura.minKey(),
+            'Se esperaba RBT Preorden': None,
+            'Se obtuvo RBT Preorden': None}
 
-    if state_val == VALIDATION_STATES[-1]:
-        print('Se esperaba:', end_val)
-        print('Se obtuvo:  ', end_test)
-        info['Se esperaba'] = end_val
-        info['Se obtuvo'] = end_test
+    if state_val != VALIDATION_STATES[1]:
+        print('Se esperaba RBT Preorden:', end_val)
+        print('Se obtuvo RBT Preorden  :', end_test)
+        info['Se esperaba RBT Preorden'] = end_val
+        info['Se obtuvo RBT Preorden'] = end_test
     
     return dis, estructura, info
 
@@ -551,10 +583,14 @@ def encontrarNodoRBT(estructura, nodo):
             "Vertices":nodos,
             'Altura del arbol':  (str(estructura.size()))}
 
-    # nodos = estructura.getNodeValues()
-    # print("Vertices: ", nodos)
-    # print('Altura del arbol: ', str(omap.height(estructura.estructura)))
-
+    info = {"Buscar Elemento": nodo,
+            'state': state_val,
+            'comment': comment,
+            'RBT Preorden': nodos,
+            'Size RBT': estructura.size(),
+            'Height RBT': estructura.height(),
+            'minKey RBT': estructura.minKey()}
+        
     return dis, estructura, info
 
 
@@ -594,12 +630,17 @@ def findAdjacentNodoRBT(estructura, nodo):
     nodos = estructura.getNodeValues()
     print("Nodos: ", nodos)
     print('Altura del arbol: ', str(estructura.size()))
-
-    info = {"Encontrar Adyacentes": nodo,
+    
+    info = {"Encontrar Adyacentes": nodo, 
+            "Adyacentes": listaAdj,
             'state': state_val,
             'comment': comment,
-            "Nodos":nodos,
-            'Altura del arbol':  str(estructura.size())}
+            'Adyacentes obtenidos': None,
+            'Adyacentes esperados': None}
+    
+    if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
+        info['Adyacentes obtenidos'] = listaAdj
+        info['Adyacentes esperados'] = listaAdj_val
     
     return dis, estructura, info
     
@@ -635,8 +676,21 @@ def listarNodosRBT(estructura, orden):
     print('Altura del arbol: ', str(estructura.size()))
     #print(state_val, comment)
 
-    info = {"Listar todos los vertices": "operacion",
-            "Nodos":nodos,
-            'Altura del arbol':  str(estructura.size())}
+    info = {"Listar todas las llaves": orden,
+            'state': "SUCCESFUL",
+            'comment': "No hay validación",
+            'Size RBT': estructura.size(),
+            'Nodes': nodos,
+            'Height RBT': estructura.height(),
+            'minKey RBT': estructura.minKey(),
+            'Se esperaba': None,
+            'Se obtuvo': None
+            }
+
+    """if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
+        print('Se esperaba:', nodos_val)
+        print('Se obtuvo:  ', nodos)
+        info["Se esperaba"] = nodos_val
+        info["Se obtuvo"] = nodos"""
     
     return dis, estructura, info

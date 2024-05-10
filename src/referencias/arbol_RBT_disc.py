@@ -123,6 +123,8 @@ class RBT():
                     iter = lt.iterator(tr.postorder(self.estructura))
                 elif order == 'Preorder_with_color': # NEW traversal
                     iter = lt.iterator(tr.preorder_with_color(self.estructura))
+                elif order == 'Leveled_path': # NEW traversal
+                    iter = lt.iterator(tr.leveledPath(self.estructura))
                 for i in iter:
                     lst.append(i)
             return lst

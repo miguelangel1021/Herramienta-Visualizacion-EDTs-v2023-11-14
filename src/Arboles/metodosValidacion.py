@@ -460,7 +460,7 @@ def validar_bst_darNodos(init_test, nodos, orden):
 
 
 #Metodos de validacion RBT
-def validar_rbt_crear(nodos, st_nodos):
+def validar_rbt_crear(nodos, st_nodos, nodos_color):
     '''
     Valida la operacion de crear un arreglo
 
@@ -473,6 +473,13 @@ def validar_rbt_crear(nodos, st_nodos):
         comment: mensaje informativo para el usuario
 
     '''
+
+    structure_ref = referenciaRBT()
+    state_val = VALIDATION_STATES[1]
+    
+    for i in nodos:
+        structure_ref.addNode_byValue(i)
+
     txt_nodos = ''
     for i in nodos:
         txt_nodos = txt_nodos + str(i) + ', '
@@ -506,8 +513,40 @@ def validar_rbt_crear(nodos, st_nodos):
         comment = comment + '\nSe esperaba: ' + txt_nodos[:-2]
         comment = comment + '\n  Se obtuvo: ' + txt_st[:-2]
         state_val = VALIDATION_STATES[-1]
+    
+    
+    
+    result_nodes = structure_ref.getNodeValues("Preorder_with_color")
 
-    return state_val, comment
+    if len(nodos_color) != len(result_nodes):         # numero de elementos diferentes despues de la operacion
+        detail = 'El numero de llaves resultado de la operacion es diferente. Se esperaba ' + str(len(nodos_color)) + ' y se obtuvo ' + str(len(result_nodes))
+        comment = 'Problema en crear el RBT: ' + '\n' + detail
+        state_val = VALIDATION_STATES[-1]
+
+    else: # Hay la cantidad esperada de elementos
+        sameOrder = True
+        sameColor = True
+        node = 0
+        for i in range(len(nodos_color)):
+            if (nodos_color[i][0] != result_nodes[i][0]):
+                sameOrder = False
+                node = i
+                break
+            if (nodos_color[i][1] != result_nodes[i][1]):
+                sameColor=False
+                node = i
+                break
+        if sameOrder and sameColor:
+            comment = 'Creación de RBT satisfactoria'
+            state_val = VALIDATION_STATES[1]
+        elif not sameOrder:
+            comment = 'Creación de RBT con llaves en orden diferente, se esperaba la llave ' + str(result_nodes[node][0]) + ' y se obtuvo '+ str(nodos_color[node][0])
+            state_val = VALIDATION_STATES[-1]
+        elif not sameColor:
+            comment = 'Creación de RBT con llaves de color diferente, se esperaba la llave ' + str(result_nodes[node][0]) + ' y color '+ str(result_nodes[node][1])+'. Se obtuvo '+ str(nodos_color[node][0]) + ' color '+str(nodos_color[node][1])
+            state_val = VALIDATION_STATES[-1]
+
+    return state_val, comment, result_nodes
 
 
 def validar_rbt_anadir(init_test, end_test, nodo):
@@ -759,3 +798,58 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo):
     exists = structure_ref.isNodeValue(nodo)
     
     return state_val, listaAdj_val, comment, exists
+
+def validar_rbt_darNodos(init_test, nodos, orden):
+    '''
+    Valida la operacion de encontrar listar los valores de los nodos de un arbol dado un orden
+       
+    Args:
+        init_test: lista de elementos del arbol en preorder
+        nodos: lista de valores de nodos obtenida de listar los nodos en el orden dado
+        orden: orden en el cual se listan los nodos (preorder, inorder, postorder)
+               
+    Returns:
+        state_val: Estado final de la validacion (WARNING, SUCCESSFUL, FAILED)
+        nodos_val: lista de los elementos en el orden dado, en la estructura de referencia
+        comment: mensaje informativo para el usuario
+        
+    '''
+    state_val = VALIDATION_STATES[1]
+    nodos_val = list()
+    comment = 'No se hace validacion.'
+    # return state_val, nodos_val, comment
+
+    structure_ref = referenciaRBT()
+    for i in init_test:                     #Inicializacion de la estructura de prueba
+        structure_ref.addNode_byValue(i)
+    
+    nodos_val = structure_ref.getNodeValues(orden)
+    
+    '''
+    txt_val = ''
+    for i in nodos_val:
+        txt_val = txt_val + str(i) + ', '
+        
+    txt_test = ''
+    for i in nodos:
+        txt_test = txt_test + str(i) + ', '
+    '''
+    if len(nodos) != len(nodos_val):         # numero de elementos diferentes despues de la operacion
+        detail = 'El numero de llaves resultado del recorrido es diferente. Se esperaba ' + str(len(nodos_val)) + ' y se obtuvo ' + str(len(nodos))
+        comment = 'Problema en recorrido ' + orden + '\n' + detail
+        state_val = VALIDATION_STATES[-1]
+
+    else: # Hay la cantidad esperada de elementos
+        sameOrder = True
+        for i in range(len(nodos)):
+            if (nodos[i] != nodos_val[i]):
+                sameOrder = False
+                break
+        if sameOrder:
+            comment = 'Recorrido ' + orden + ' satisfactorio'
+            state_val = VALIDATION_STATES[1]
+        else:
+            comment = 'Recorrido ' + orden + ' en orden diferente'
+            state_val = VALIDATION_STATES[-1]
+
+    return state_val, nodos_val, comment

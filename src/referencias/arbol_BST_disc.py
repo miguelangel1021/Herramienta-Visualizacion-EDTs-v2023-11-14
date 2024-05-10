@@ -76,6 +76,8 @@ class bst():
                 iter = lt.iterator(tr.preorder(self.estructura))
             elif order == 'Postorder':
                 iter = lt.iterator(tr.postorder(self.estructura))
+            elif order == 'Leveled_path': # NEW traversal
+                iter = lt.iterator(tr.leveledPath(self.estructura))
             for i in iter:
                 lst.append(i)
         return lst
