@@ -448,7 +448,7 @@ def encontrarAdyacentes():
         except Exception as e:
             raise DefaultError(str(e))
     else:
-        raise DefaultError("Por favor ingrese el valor a busacr.")
+        raise DefaultError("Por favor ingrese el valor a busacar.")
     user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
