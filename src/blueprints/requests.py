@@ -204,24 +204,6 @@ def crearListaEstatica():
 def crearListaArchivo():
     pass
 
-"""@request_blueprint.route('/listas/crearRandom', methods= ['GET'])
-def crearListaRandom():
-    init = "Random"
-    respuesta = crearListaEnlazada(actual.type, actual.file, init)
-    actual.estructura = respuesta[0]
-
-    response = make_response(respuesta[1])
-
-    # Establecer el tipo de contenido
-    response.headers['Content-Type'] = 'image/svg+xml'
-
-    # Establecer los encabezados con la información adicional
-    info = respuesta[2]
-    response.headers['msj'] = info["msj"]
-    response.headers['estado'] = info["estado"]
-    response.headers['comment'] = info["comment"]
-    response.headers['size'] = info["size"]
-    return response,200"""
 
 @request_blueprint.route('/listas/crearRandom', methods=['GET'])
 def crearListaRandom():
@@ -288,7 +270,8 @@ def añadirNodoLista():
                 respuesta = anadirNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor que será añadido a la lista.")
     user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
@@ -331,7 +314,8 @@ def añadirNodoPrincipio():
                 respuesta = anadirNodoListaFirst(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor que será añadido al principio de la lista.")
     user_sessions[session_id].estructura = respuesta[0]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[1]).decode('utf-8')
@@ -375,7 +359,8 @@ def eliminarNodo():
                 respuesta = eliminarNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor que será eliminado de la lista.")
     user_sessions[session_id].estructura = respuesta[0]
     # Establecer los encabezados con la información adicional
     info = respuesta[2]
@@ -418,7 +403,8 @@ def encontrarNodo():
                 respuesta = encontrarNodoLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor a buscar.")
     user_sessions[session_id].estructura = respuesta[0]
     
     info = respuesta[2]
@@ -461,7 +447,8 @@ def encontrarAdyacentes():
                 respuesta = findAdjacentNodeLista(user_sessions[session_id].estructura, user_sessions[session_id].type, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor a busacr.")
     user_sessions[session_id].estructura = respuesta[0]
 
     info = respuesta[2]
@@ -535,6 +522,8 @@ def crearArbolRandom():
     user_sessions[session_id].estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
+    order = respuesta[3]
+    user_sessions[session_id].rbt_order = order
     # Convertir la imagen SVG a una cadena
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -578,6 +567,8 @@ def crearArbolEstatico():
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
+    order = respuesta[3]
+    user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -617,6 +608,8 @@ def crearArbolVacio():
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
+    order = respuesta[3]
+    user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -661,12 +654,15 @@ def AñadirNodoArbol():
                 if user_sessions[session_id].type == 3:
                     respuesta = anadirNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = anadirNodoRBT(user_sessions[session_id].estructura, data)
+                    respuesta = anadirNodoRBT(user_sessions[session_id].estructura, data, user_sessions[session_id].rbt_order)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor para añadir")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
+    order = respuesta[3]
+    user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -707,12 +703,15 @@ def EliminarNodoArbol():
                 if user_sessions[session_id].type == 3:
                     respuesta = eliminarNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = eliminarNodoRBT(user_sessions[session_id].estructura, data)
+                    respuesta = eliminarNodoRBT(user_sessions[session_id].estructura, data, user_sessions[session_id].rbt_order)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor para eliminar")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
+    order = respuesta[3]
+    user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -755,7 +754,8 @@ def EncontrarNodoArbol():
                     respuesta = encontrarNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor para buscar en le arbol")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -800,7 +800,8 @@ def EncontrarAdyacentesArbol():
                     respuesta = findAdjacentNodoRBT(user_sessions[session_id].estructura, data)
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -990,7 +991,8 @@ def AñadirNodoGrafo():
                 respuesta = anadirNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor para añadir al grafo")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -1028,7 +1030,8 @@ def EliminarNodoGrafo():
                 respuesta = eliminarNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese un valor para eliminar del grafo.")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -1066,7 +1069,8 @@ def EncontrarNodoGrafo():
                 respuesta = existeNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor a buscar")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -1106,7 +1110,8 @@ def AñadirArco():
                 respuesta = anadirArcoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, origen, destino, peso)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese los valores para añadir el arco correctamente.")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
@@ -1144,7 +1149,8 @@ def encontrarAdyacentesGrafo():
                 respuesta = adyacentesNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
         except Exception as e:
             raise DefaultError(str(e))
-
+    else:
+        raise DefaultError("Por favor ingrese el valor a buscar")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')

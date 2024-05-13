@@ -7,5 +7,6 @@ class Actual():
         self.file = file
         self.lastAccesTime = lastAccesTime
         self.estructura = estructura
+        self.rbt_order = None
 
 

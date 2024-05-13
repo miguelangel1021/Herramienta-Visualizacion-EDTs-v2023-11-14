@@ -367,11 +367,13 @@ def crearRBT(init, file, data={}):
         raise Exception(e + "\tProblema al crear el arbol BST, método bst()")
     long = 0
     nodos = list()
+    order = list()
     if init == 'Random':
         long = random.randint(5,10)
         nodos = create_n_random(long)
         for i in nodos:
             try:
+                order.append([i, "AÑADIR"])
                 estructura.addNode_byValue(i)
             except:
                 e = '\tProblema al añadir el elemento "'+str(i)+'", método addNode_byValue()'
@@ -383,6 +385,7 @@ def crearRBT(init, file, data={}):
             raise Exception("El formato del archivo ingresado no es válido")
         for i in nodos:
             try:
+                order.append([i, "AÑADIR"])
                 estructura.addNode_byValue(i)
             except:
                 e = '\tProblema al añadir el elemento "'+str(i)+'", método addNode_byValue()'
@@ -423,9 +426,9 @@ def crearRBT(init, file, data={}):
         info['Se esperaba RBT Preorden'] = end_val
         info['Se obtuvo RBT Preorden'] = nodos_color
 
-    return dis, estructura, info
+    return dis, estructura, info, order
 
-def anadirNodoRBT(estructura, nodo):
+def anadirNodoRBT(estructura, nodo, order):
     """
     Añade un nodo al RBT
 
@@ -438,17 +441,19 @@ def anadirNodoRBT(estructura, nodo):
         Exception
     """
     try:
-        init_test = estructura.getNodeValues("Preorder")
+        init_test = estructura.getNodeValues("Preorder_with_color")
     except:
         e = '\tProblema al obtener las llaves, método getNodeValues()'
         raise Exception(e)
     try:
         estructura.addNode_byValue(nodo) # Ejecutar funcion de Prueba
+        
         print('Get node values')
-        end_test = estructura.getNodeValues("Preorder")
+        end_test = estructura.getNodeValues("Preorder_with_color")
         print('Get node values post')
         print(end_test)
-        state_val, end_val, comment = validar_rbt_anadir(init_test, end_test, nodo) 
+        state_val, end_val, comment = validar_rbt_anadir(init_test, end_test, nodo, order)
+        order.append([nodo, "AÑADIR"]) 
     except:
         e = '\tProblema al añadir el elemento "'+str(nodo)+'", método addNode_byValue()'
         raise Exception(e)
@@ -461,19 +466,6 @@ def anadirNodoRBT(estructura, nodo):
     print("Llaves: ", end_test)
     print('Altura del arbol: ', str(estructura.size()))
 
-    info = {"Añadir elemento": nodo,
-            'state': state_val,
-            'comment': comment,
-            'Altura del arbol': str(estructura.size()),
-            'Se esperaba': None,
-            'Se obtuvo': None}
-
-    if state_val != VALIDATION_STATES[1]:  # Resultado No exitoso
-        print('Se esperaba:', end_val)
-        print('Se obtuvo:  ', end_test)
-        info['Se esperaba'] = end_val
-        info['Se obtuvo'] = end_test
-    
 
     info = {"Añadir llave": nodo,
             'state': state_val,
@@ -492,9 +484,9 @@ def anadirNodoRBT(estructura, nodo):
         info['Se obtuvo RBT Preorden'] = end_test
 
     
-    return dis,estructura,info
+    return dis,estructura,info, order
 
-def eliminarNodoRBT(estructura, nodo):
+def eliminarNodoRBT(estructura, nodo, order):
     """
     Elimina un nodo al BST
 
@@ -507,14 +499,18 @@ def eliminarNodoRBT(estructura, nodo):
         Exception
     """
     try:
-        init_test = estructura.getNodeValues("Preorder")
+        init_test = estructura.getNodeValues("Preorder_with_color")
+        init = estructura.getNodeValues()
     except:
         e = '\tProblema al obtener todos los elementos, método getNodeValues()'
         raise Exception(e)
     try:
         ans = estructura.deleteNode_byValue(nodo)
-        end_test = estructura.getNodeValues("Preorder")
-        state_val, end_val, comment = validar_rbt_eliminar(init_test, end_test, nodo, ans) 
+        
+        end_test = estructura.getNodeValues("Preorder_with_color")
+        test_end = estructura.getNodeValues()
+        state_val, end_val, comment = validar_rbt_eliminar(init_test, end_test, nodo, ans, order, init, test_end)
+        order.append([nodo, "ELIMINAR"]) 
     except:
         e = '\tProblema al eliminar el elemento "'+str(nodo)+'", método deleteNode_byValue()'
     
@@ -544,7 +540,7 @@ def eliminarNodoRBT(estructura, nodo):
         info['Se esperaba RBT Preorden'] = end_val
         info['Se obtuvo RBT Preorden'] = end_test
     
-    return dis, estructura, info
+    return dis, estructura, info, order
 
 def encontrarNodoRBT(estructura, nodo):
     """
@@ -595,7 +591,7 @@ def encontrarNodoRBT(estructura, nodo):
 
 
     
-def findAdjacentNodoRBT(estructura, nodo):
+def findAdjacentNodoRBT(estructura, nodo, order):
     """
     Encuentra los adyacentes de un nodo en el bst
 
@@ -614,7 +610,7 @@ def findAdjacentNodoRBT(estructura, nodo):
         raise Exception(e)
     try:
         listaAdj = estructura.findAdjacentNode(nodo)
-        state_val, listaAdj_val, comment, exists = validar_rbt_adyacentes(init_test, listaAdj, nodo) 
+        state_val, listaAdj_val, comment, exists = validar_rbt_adyacentes(init_test, listaAdj, nodo, order) 
     except:
         e = '\tProblema al buscar los adyacentes del elemento "' + str(nodo) + '" , método findAdjacentNode()'
         raise Exception(e)

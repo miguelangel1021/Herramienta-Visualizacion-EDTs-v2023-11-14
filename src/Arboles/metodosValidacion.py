@@ -549,7 +549,7 @@ def validar_rbt_crear(nodos, st_nodos, nodos_color):
     return state_val, comment, result_nodes
 
 
-def validar_rbt_anadir(init_test, end_test, nodo):
+def validar_rbt_anadir(init_test, end_test, nodo, order):
     '''
     Valida la operacion de añadir un elemento al RBT. 
 
@@ -569,38 +569,50 @@ def validar_rbt_anadir(init_test, end_test, nodo):
     state_val = VALIDATION_STATES[1]
     end_val = list()
     comment = 'No se hace validacion.'
-    return state_val, end_val, comment
+    #return state_val, end_val, comment
 
-    for i in init_test:  # Inicializacion de la estructura de prueba
-        structure_ref.addNode_byValue(i)
+    for i in order:  # Inicializacion de la estructura de prueba
+        if i[1] == "AÑADIR":
+            structure_ref.addNode_byValue(i[0])
+        else:
+            structure_ref.deleteNode_byValue(i[0])
+
     structure_ref.addNode_byValue(nodo)  # Ejecutar accion
-    end_val = structure_ref.getNodeValues()  # Resultado de validacion
+    end_val = structure_ref.getNodeValues("Preorder_with_color")  # Resultado de validacion
 
     if len(end_test) == len(end_val):  # Hay la cantidad esperada de elementos
         sameOrder = True
+        sameColor = True
         for i in range(len(end_test)):
-            if end_test[i] != end_val[i]:
+            if end_test[i][0] != end_val[i][0]:
                 sameOrder = False
                 break
-        if sameOrder:
+            if end_test[i][1] != end_val[i][1]:
+                sameColor = False
+                break
+        if sameOrder and sameColor:
             comment = 'El elemento "' + \
                 str(nodo) + '" se añadió satisfactoriamente'
             state_val = VALIDATION_STATES[1]
         else:
+            if not sameColor:
+                comment= "Al añadir el elemento se modificaron los colores de los nodos. \n"
+                state_val = VALIDATION_STATES[0]
             test = set(end_test)
             val = set(end_val)
             if test == val:
-                comment = 'El elemento "' + \
+                comment += 'El elemento "' + \
                     str(nodo) + '" se añadió satisfactoriamente, pero no en la posición esperada'
                 state_val = VALIDATION_STATES[0]
             else:
-                comment = 'El elemento "' + \
+                comment += 'El elemento "' + \
                     str(nodo) + '" NO se añadió, hay un elemento adicional pero no corresponde al elemento esperado'
                 state_val = VALIDATION_STATES[-1]
+            
     elif len(end_test) == len(end_val) - 1:  # no hay cambios en la cantidad de elementos
         sameOrder = True
         for i in range(len(end_test)):
-            if end_test[i] != end_val[i]:
+            if end_test[i][0] != end_val[i][0]:
                 sameOrder = False
                 break
         if sameOrder:
@@ -611,7 +623,7 @@ def validar_rbt_anadir(init_test, end_test, nodo):
                 str(nodo) + '" pudo haberse añadido, pero reemplazó a un elemento del arreglo'
             state_val = VALIDATION_STATES[-1]
     elif len(end_test) < len(init_test):  # Se eliminaron elementos
-        comment = 'Se eliminaron elementos del arreglo, hay menos de los que habian antes de ejecutar la operación de añadir'
+        comment = 'Se eliminaron elementos del arbol, hay menos de los que habian antes de ejecutar la operación de añadir'
         state_val = VALIDATION_STATES[-1]
     else:   # Hay mas elementos de los esperados
         cant = len(end_test) - len(end_val)
@@ -620,7 +632,7 @@ def validar_rbt_anadir(init_test, end_test, nodo):
     return state_val, end_val, comment
 
 
-def validar_rbt_eliminar(init_test, end_test, nodo, ans):
+def validar_rbt_eliminar(init_test, end_test, nodo, ans, order, init, test_end):
     '''
     Valida la operacion de eliminar un elemento del arreglo. 
     Se espera que el elemento se elimine del arreglo.
@@ -638,21 +650,28 @@ def validar_rbt_eliminar(init_test, end_test, nodo, ans):
     '''
 
     structure_ref = referenciaRBT()
-    for i in init_test:  # Inicializacion de la estructura de prueba
-        structure_ref.addNode_byValue(i)
+    for i in order:  # Inicializacion de la estructura de prueba
+        if i[1] == "AÑADIR":
+            structure_ref.addNode_byValue(i[0])
+        else:
+            structure_ref.deleteNode_byValue(i[0])
     ans2 = structure_ref.deleteNode_byValue(nodo)  # Ejecutar accion
-    end_val = structure_ref.getNodeValues()  # Resultado de validacion
-    
+    end_val = structure_ref.getNodeValues("Preorder_with_color")  # Resultado de validacion
+    end = structure_ref.getNodeValues() 
     print(end_test)
     print(end_val)
 
     if len(end_test) == len(end_val):  # Hay la cantidad esperada de elementos
         sameOrder = True
+        sameColor = False
         for i in range(len(end_test)):
-            if end_test[i] != end_val[i]:
+            if end_test[i][0] != end_val[i][0]:
                 sameOrder = False
                 break
-        if sameOrder:
+            if end_test[i][1] != end_val[i][1]:
+                sameColor = False
+                break
+        if sameOrder and sameColor:
             if ans2 == False:
                 comment = 'El elemento "' + \
                     str(nodo) + '" no hace parte del arbol'
@@ -662,41 +681,44 @@ def validar_rbt_eliminar(init_test, end_test, nodo, ans):
                     str(nodo) + '" se eliminó satisfactoriamente'
                 state_val = VALIDATION_STATES[1]
         else:
+            if not sameColor:
+                comment= "Al añadir el elemento se modificaron los colores de los nodos. \n"
+                state_val = VALIDATION_STATES[0]
             end_test = sorted(
-                end_test, key=functools.cmp_to_key(defaultfunction))
+                end_test)
             end_val = sorted(
-                end_val, key=functools.cmp_to_key(defaultfunction))
+                end_val)
             if(end_test == end_val):
                 if ans2 == False:
-                    comment = 'El elemento "' + \
+                    comment += 'El elemento "' + \
                         str(nodo) + '" no hace parte del arbol'
                     state_val = VALIDATION_STATES[1]
                 else:
-                    comment = 'No se eliminó satisfactoriamente, se eliminó un elemento diferente "' + \
+                    comment += 'No se eliminó satisfactoriamente, se eliminó un elemento diferente "' + \
                         str(nodo) + '"'
                     state_val = VALIDATION_STATES[1]
             else:
-                comment = 'El elemento "' + \
+                comment += 'El elemento "' + \
                     str(nodo) + '" No se eliminó satisfactoriamente, se eliminó un elemento diferente'
                 state_val = VALIDATION_STATES[-1]
     elif len(end_test) == len(init_test):  # no hay cambios en la cantidad de elementos
         sameOrder = True
         for i in range(len(end_test)):
-            if end_test[i] != init_test[i]:
+            if end_test[i][0] != init_test[i][0]:
                 sameOrder = False
                 break
         if sameOrder:
             comment = 'No se eliminó el elemento "' + \
-                str(nodo) + '". La lista no presenta cambios'
+                str(nodo) + '". el arbol no presenta cambios'
             state_val = VALIDATION_STATES[-1]
         else:
             comment = 'No se eliminó el elemento "' + \
-                str(nodo) + '". La lista presenta cambios no esperados'
+                str(nodo) + '". el arbol presenta cambios no esperados'
             state_val = VALIDATION_STATES[-1]
     elif len(end_test) < len(end_val):  # Se eliminaron mas elementos
-        test = set(end_test)
-        val = set(end_val)
-        if nodo not in end_test:
+        test = set(init)
+        val = set(end)
+        if nodo not in test_end:
             comment = 'No se eliminó satisfactoriamente, se eliminó un elemento diferente "'
             state_val = VALIDATION_STATES[0]
         elif test == val:
@@ -756,7 +778,7 @@ def validar_rbt_encontrar(nodos, nodo, ans):
 
     return state_val, ans_val, comment
 
-def validar_rbt_adyacentes(init_test, listaAdj, nodo):
+def validar_rbt_adyacentes(init_test, listaAdj, nodo, order):
     '''
     Valida la operacion de encontrar los valores de los nodos adyacentes a un 
     elemento en el grafo.
@@ -774,10 +796,12 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo):
         
     '''
     structure_ref = referenciaRBT()
-    for i in init_test:                     #Inicializacion de la estructura de prueba
-        structure_ref.addNode_byValue(i)
-    listaAdj_val = structure_ref.findAdjacentNode(nodo)   
-    
+    for i in order: 
+        if i[1] == "AÑADIR":
+            structure_ref.addNode_byValue(i[0])
+        else:
+            structure_ref.deleteNode_byValue(i[0])
+    listaAdj_val = structure_ref.findAdjacentNode(nodo) 
     listaAdj_val = sorted(listaAdj_val, key=functools.cmp_to_key(defaultfunction))
     listaAdj = sorted(listaAdj, key=functools.cmp_to_key(defaultfunction))
     txt = ''
@@ -821,7 +845,10 @@ def validar_rbt_darNodos(init_test, nodos, orden):
 
     structure_ref = referenciaRBT()
     for i in init_test:                     #Inicializacion de la estructura de prueba
-        structure_ref.addNode_byValue(i)
+        if i[1] == "AÑADIR":
+            structure_ref.addNode_byValue(i[0])
+        else:
+            structure_ref.deleteNode_byValue(i[0])
     
     nodos_val = structure_ref.getNodeValues(orden)
     
