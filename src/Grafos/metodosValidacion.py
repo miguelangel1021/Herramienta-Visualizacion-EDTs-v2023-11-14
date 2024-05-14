@@ -1,6 +1,6 @@
 import functools
 from soporte.soporte import defaultfunction, VALIDATION_STATES
-from referencias.grafo_disc_ import grafo as referenciaGrafo
+from referencias.grafo_disc import grafo as referenciaGrafo
 
 
 
