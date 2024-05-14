@@ -522,8 +522,9 @@ def crearArbolRandom():
     user_sessions[session_id].estructura = respuesta[1]
     # Obtener la información adicional
     info = respuesta[2]
-    order = respuesta[3]
-    user_sessions[session_id].rbt_order = order
+    if user_sessions[session_id].type != 3:
+        order = respuesta[3]
+        user_sessions[session_id].rbt_order = order
     # Convertir la imagen SVG a una cadena
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -567,8 +568,9 @@ def crearArbolEstatico():
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
-    order = respuesta[3]
-    user_sessions[session_id].rbt_order = order
+    if user_sessions[session_id].type != 3:
+        order = respuesta[3]
+        user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -608,8 +610,9 @@ def crearArbolVacio():
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
-    order = respuesta[3]
-    user_sessions[session_id].rbt_order = order
+    if user_sessions[session_id].type != 3:
+        order = respuesta[3]
+        user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -661,8 +664,9 @@ def AñadirNodoArbol():
         raise DefaultError("Por favor ingrese un valor para añadir")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
-    order = respuesta[3]
-    user_sessions[session_id].rbt_order = order
+    if user_sessions[session_id].type != 3:
+        order = respuesta[3]
+        user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
@@ -710,8 +714,9 @@ def EliminarNodoArbol():
         raise DefaultError("Por favor ingrese un valor para eliminar")
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
-    order = respuesta[3]
-    user_sessions[session_id].rbt_order = order
+    if user_sessions[session_id].type != 3:
+        order = respuesta[3]
+        user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
     response_data = {
