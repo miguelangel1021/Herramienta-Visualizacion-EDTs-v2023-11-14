@@ -266,9 +266,8 @@ class grafo:
             for i in pathss:
                 x = i['first']
                 while x['next'] is not None:
-                    #edges.append((x['info'], x['next']['info']))
-                    if (x['next']['info'], x['info']) not in edges:
-                        edges.append((x['next']['info'], x['info']))
+                    edges.append((x['info'], x['next']['info']))
+                    edges.append((x['next']['info'], x['info']))
                     x = x['next']
             tuplesss = (edges, sorted(table))
             return tuplesss
@@ -292,9 +291,8 @@ class grafo:
             for i in pathss:
                 x = i['first']
                 while x['next'] is not None:
-                    #edges.append((x['info'], x['next']['info']))
-                    if (x['next']['info'], x['info']) not in edges:
-                        edges.append((x['next']['info'], x['info']))
+                    edges.append((x['info'], x['next']['info']))
+                    edges.append((x['next']['info'], x['info']))
                     x = x['next']
             tuplesss = (edges, sorted(table))
             return tuplesss
@@ -302,21 +300,17 @@ class grafo:
         if algoritmo == 'DepthFirstOrder':
             search = dfo.DepthFirstOrder(self.estructura)
             table.append('Pre')
-            pre = []
             while not stack.isEmpty(search['pre']):
                 top = stack.pop(search['pre'])
-                pre.append(top)
+                table.append(top)
             table.append('Post')
-            post = []
             while not stack.isEmpty(search['post']):
                 top = stack.pop(search['post'])
-                post.append(top)
+                table.append(top)
             table.append('Reverse')
-            reverse=[]
             while not stack.isEmpty(search['reversepost']):
                 top = stack.pop(search['reversepost'])
-                reverse.append(top)
-            return (pre, post, reverse)
+                table.append(top)
 
         if algoritmo == 'PrimMST':
             search = prim.initSearch(self.estructura)
