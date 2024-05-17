@@ -844,7 +844,7 @@ def NodosArbol():
             if user_sessions[session_id].type == 3:
                 respuesta = listarNodosBST(user_sessions[session_id].estructura, order)
             else:
-                respuesta = listarNodosRBT(user_sessions[session_id].estructura, order)
+                respuesta = listarNodosRBT(user_sessions[session_id].estructura, order,user_sessions[session_id].rbt_order )
     except Exception as e:
         traceback.print_exc()
         raise DefaultError(str(e))

@@ -1,7 +1,7 @@
 import random
 from DISClib.ADT import orderedmap as omap
 from soporte.soporte import create_n_random
-from .metodosValidacion import validar_bst_crear,validar_bst_anadir,validar_bst_adyacentes,validar_bst_darNodos,validar_bst_eliminar,validar_bst_encontrar,VALIDATION_STATES,validar_rbt_adyacentes,validar_rbt_anadir,validar_rbt_crear,validar_rbt_eliminar,validar_rbt_encontrar
+from .metodosValidacion import validar_bst_crear,validar_bst_anadir,validar_bst_adyacentes,validar_bst_darNodos,validar_bst_eliminar,validar_bst_encontrar,VALIDATION_STATES,validar_rbt_adyacentes,validar_rbt_anadir,validar_rbt_crear, validar_rbt_darNodos,validar_rbt_eliminar,validar_rbt_encontrar
 from .metodosGraficos import displayBST, displayRBT
 
 
@@ -646,7 +646,7 @@ def findAdjacentNodoRBT(estructura, nodo, order):
     return dis, estructura, info
     
 
-def listarNodosRBT(estructura, orden):
+def listarNodosRBT(estructura, orden, rbt_orden):
     """
     Lista todos los nodos del BST en el orden especificado
 
@@ -659,14 +659,14 @@ def listarNodosRBT(estructura, orden):
         Exception
     """
     try:
-        #init_test = estructura.getNodeValues()
+        init_test = estructura.getNodeValues()
         x = 1
     except:
         e = '\tProblema al obtener todos los elementos, método getNodeValues()'
         raise Exception(e)
     try:
         nodos = estructura.getNodeValues(orden)
-        #state_val, nodos_val, comment = validar(init_test, nodos, orden) 
+        state_val, nodos_val, comment = validar_rbt_darNodos(init_test, nodos, orden, rbt_orden)
     except:
         e = '\tProblema al listar todos los elementos, método getNodeValues()'
         raise Exception(e)
@@ -678,8 +678,8 @@ def listarNodosRBT(estructura, orden):
     #print(state_val, comment)
 
     info = {"Listar todas las llaves": orden,
-            'state': "SUCCESFUL",
-            'comment': "No hay validación",
+            'state': state_val,
+            'comment': comment,
             'Size RBT': estructura.size(),
             'Nodes': nodos,
             'Height RBT': estructura.height(),

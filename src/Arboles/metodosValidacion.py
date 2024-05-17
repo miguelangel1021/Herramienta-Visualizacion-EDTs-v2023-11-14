@@ -823,7 +823,7 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo, order):
     
     return state_val, listaAdj_val, comment, exists
 
-def validar_rbt_darNodos(init_test, nodos, orden):
+def validar_rbt_darNodos(init_test, nodos, orden, rbt_orden):
     '''
     Valida la operacion de encontrar listar los valores de los nodos de un arbol dado un orden
        
@@ -844,7 +844,7 @@ def validar_rbt_darNodos(init_test, nodos, orden):
     # return state_val, nodos_val, comment
 
     structure_ref = referenciaRBT()
-    for i in init_test:                     #Inicializacion de la estructura de prueba
+    for i in rbt_orden:                     #Inicializacion de la estructura de prueba
         if i[1] == "AÑADIR":
             structure_ref.addNode_byValue(i[0])
         else:
