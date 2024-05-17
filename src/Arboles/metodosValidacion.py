@@ -663,7 +663,7 @@ def validar_rbt_eliminar(init_test, end_test, nodo, ans, order, init, test_end):
 
     if len(end_test) == len(end_val):  # Hay la cantidad esperada de elementos
         sameOrder = True
-        sameColor = False
+        sameColor = True
         for i in range(len(end_test)):
             if end_test[i][0] != end_val[i][0]:
                 sameOrder = False
@@ -682,7 +682,7 @@ def validar_rbt_eliminar(init_test, end_test, nodo, ans, order, init, test_end):
                 state_val = VALIDATION_STATES[1]
         else:
             if not sameColor:
-                comment= "Al añadir el elemento se modificaron los colores de los nodos. \n"
+                comment= "Al eliminar el elemento se modificaron los colores de los nodos. \n"
                 state_val = VALIDATION_STATES[0]
             end_test = sorted(
                 end_test)

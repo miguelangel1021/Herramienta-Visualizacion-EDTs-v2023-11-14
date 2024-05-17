@@ -607,11 +607,14 @@ def crearArbolVacio():
             respuesta = crearRBT("Vacia", user_sessions[session_id].file)
     
     except Exception as e:
+        traceback.print_exc()
         raise DefaultError(str(e))
     user_sessions[session_id].estructura = respuesta[1]
     info = respuesta[2]
+    print(user_sessions[session_id].type, "hola")
     if user_sessions[session_id].type != 3:
         order = respuesta[3]
+        print(user_sessions[session_id].type, order)
         user_sessions[session_id].rbt_order = order
     image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
     # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
@@ -802,7 +805,7 @@ def EncontrarAdyacentesArbol():
                 if user_sessions[session_id].type == 3:
                     respuesta = findAdjacentNodoBST(user_sessions[session_id].estructura, data)
                 else:
-                    respuesta = findAdjacentNodoRBT(user_sessions[session_id].estructura, data)
+                    respuesta = findAdjacentNodoRBT(user_sessions[session_id].estructura, data, user_sessions[session_id].rbt_order)
         except Exception as e:
             raise DefaultError(str(e))
     else:
@@ -1129,6 +1132,45 @@ def AñadirArco():
 
 @request_blueprint.route('/grafos/encontrarAdyacents', methods= ['POST'])
 def encontrarAdyacentesGrafo():
+
+    session_id = request.headers.get('Session-Id')
+    if session_id is None:
+        raise IdNotInRequest
+    
+    if session_id not in user_sessions:
+        raise ExpiredSessionId
+    
+    user_sessions[session_id].lastAccesTime = datetime.now()
+    json = request.get_json()
+    value = json.get('value').strip()
+    if len(value) > 0:
+        try:
+            try:
+                if user_sessions[session_id].estructura == None:
+                    raise DefaultError("La estructura no ha sido creada correctamente")
+                state, comment = validarEstructura([4,7], user_sessions[session_id].type)
+                if not state:
+                    print(comment)
+            except:
+                raise DefaultError("La estructura no ha sido creada correctamente")
+            if state:
+                respuesta = adyacentesNodoGraph(user_sessions[session_id].estructura, user_sessions[session_id].type, True, value)    
+        except Exception as e:
+            raise DefaultError(str(e))
+    else:
+        raise DefaultError("Por favor ingrese el valor a buscar")
+    user_sessions[session_id].estructura = respuesta[1]
+    info = respuesta[2]
+    image_base64 = base64.b64encode(respuesta[0]).decode('utf-8')
+    # Crear un objeto JSON que contenga tanto la imagen SVG como la información adicional
+    response_data = {
+        'svg_image': image_base64,
+        'info': info
+    }
+    return jsonify(response_data),200
+
+@request_blueprint.route('/grafos/encontrarAdy', methods= ['POST'])
+def encontrarAdyGrafo():
 
     session_id = request.headers.get('Session-Id')
     if session_id is None:

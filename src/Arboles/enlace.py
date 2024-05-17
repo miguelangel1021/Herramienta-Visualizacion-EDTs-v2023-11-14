@@ -367,7 +367,7 @@ def crearRBT(init, file, data={}):
         raise Exception(e + "\tProblema al crear el arbol BST, método bst()")
     long = 0
     nodos = list()
-    order = list()
+    order = []
     if init == 'Random':
         long = random.randint(5,10)
         nodos = create_n_random(long)
@@ -410,17 +410,22 @@ def crearRBT(init, file, data={}):
     print(state_val)    
     print(comment)
     #print('Altura del arbol: ', str(omap.height(estructura.estructura)))
-
-    info = {"Total llaves": str(len(nodos_color)),
-            'Crear RBT': init,
-            'state': state_val,
-            'comment': comment,
-            'RBT Preorden': nodos_color,
-            'Size RBT': estructura.size(),
-            'Height RBT': estructura.height(),
-            'minKey RBT': estructura.minKey(),
-            'Se esperaba RBT Preorden': None,
-            'Se obtuvo RBT Preorden': None}
+    if init != "Vacia":
+        info = {"Total llaves": str(len(nodos_color)),
+                'Crear RBT': init,
+                'state': state_val,
+                'comment': comment,
+                'RBT Preorden': nodos_color,
+                'Size RBT': estructura.size(),
+                'Height RBT': estructura.height(),
+                'minKey RBT': estructura.minKey(),
+                'Se esperaba RBT Preorden': None,
+                'Se obtuvo RBT Preorden': None}
+    else:
+        info = {"Total llaves": str(len(nodos_color)),
+                'Crear RBT': init,
+                'state': state_val,
+                'comment': comment}
     
     if state_val != VALIDATION_STATES[1]: # Si no fue exitoso, mostrar los resultados esperados y obtenidos
         info['Se esperaba RBT Preorden'] = end_val

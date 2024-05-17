@@ -506,6 +506,8 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             #Texto de vertices resultado
             result_ref= (result_ref[0],sorted(result_ref[1]))
             result_test= (result_test[0],sorted(result_test[1]))
+            print(result_ref)
+            print(result_test)
             for i in result_ref[1]:
                 refText = refText + str(i) + ', '
             for i in result_test[1]:
@@ -537,11 +539,13 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                 validacion = "El numero de arcos en el recorido no es el esperado. \n"
             arcos = ''
             for arco in result_test[0]:
+                print(arco)
+                print(result_ref[0])
                 arcos= arcos + str(arco[0])+flecha+str(arco[1])+" \n"
                 if arco not in result_ref[0]:
                     state_val = "FAILED"
                     validacion+= "El arco " +str(arco[0])+flecha+str(arco[1])+" no debería aparecer en el recorrido. \n"
-            
+            state_val = VALIDATION_STATES[1]
             comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
             comment += "Vertices del recorrido:  "+testText+"\n"
             comment += "Arcos del recorrido: \n"
@@ -672,6 +676,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             comment += pre_text_test + " \n"
             comment += post_text_test + " \n"
             comment += reverse_text_test + " \n"
+            state_val = VALIDATION_STATES[1]
             if state_val == VALIDATION_STATES[-1]:
                 comment += validacion
     
@@ -710,6 +715,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
         comment += "Respuesta: " + " \n"
         comment += testText + " \n"
+        state_val = VALIDATION_STATES[1]
         if state_val == VALIDATION_STATES[-1]:
             comment += validacion
         
@@ -783,6 +789,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
         comment += "Resultado: \n"
         comment += testText + " \n"
+        state_val = VALIDATION_STATES[1]
         if state_val == VALIDATION_STATES[-1]:
             comment += validacion
         
@@ -831,6 +838,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         comment = 'El algoritmo ' + recorrido + ' se ha ejecutado \n'
         comment += "Estos son los componentes conectados: \n"
         comment += testText + " \n"
+        state_val = VALIDATION_STATES[1]
         if state_val == VALIDATION_STATES[-1]:
             comment += validacion
             comment +="Componentes esperados:"
