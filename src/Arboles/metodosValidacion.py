@@ -801,16 +801,25 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo, order):
             structure_ref.addNode_byValue(i[0])
         else:
             structure_ref.deleteNode_byValue(i[0])
+
     listaAdj_val = structure_ref.findAdjacentNode(nodo) 
-    listaAdj_val = sorted(listaAdj_val, key=functools.cmp_to_key(defaultfunction))
-    listaAdj = sorted(listaAdj, key=functools.cmp_to_key(defaultfunction))
+    listaAdj_val = sorted(listaAdj_val[1], key=functools.cmp_to_key(defaultfunction))
+    listaAdj = sorted(listaAdj[1], key=functools.cmp_to_key(defaultfunction))
     txt = ''
+
+    buscar= structure_ref.isNodeValue(nodo)
+    if not buscar:
+        return VALIDATION_STATES[0], [], "El nodo " +str(nodo)+ " no se enecuentra en el arbol"
+
     for i in listaAdj_val:
         txt = txt + str(i) + ', '
 
     if listaAdj == listaAdj_val:
-        comment = 'El elemento "'+ str(nodo)+ '" tiene '+str(len(listaAdj_val))+' adyacente(s): ' + txt[:-2]
-        state_val = VALIDATION_STATES[1]
+        if len(listaAdj) != 0:
+            comment = 'El elemento "'+ str(nodo)+ '" tiene '+str(len(listaAdj_val))+' adyacente(s): ' + txt[:-2]
+            state_val = VALIDATION_STATES[1]
+        else:
+            comment = 'El elemento "'+ str(nodo)+ '" tiene '+str(len(listaAdj_val))+' adyacente(s): ' + txt[:-2]
     else:
         comment = 'No se encontraron todos los adyacentes del elemento\nSe esperaban los elementos: ' + txt[:-2]
         txt = ''
@@ -819,9 +828,7 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo, order):
         comment = comment + '\nSe obtuvo: ' + txt[:-2]
         state_val = VALIDATION_STATES[-1]
     
-    exists = structure_ref.isNodeValue(nodo)
-    
-    return state_val, listaAdj_val, comment, exists
+    return state_val, listaAdj_val, comment
 
 def validar_rbt_darNodos(init_test, nodos, orden, rbt_orden):
     '''
@@ -840,7 +847,7 @@ def validar_rbt_darNodos(init_test, nodos, orden, rbt_orden):
     '''
     state_val = VALIDATION_STATES[1]
     nodos_val = list()
-    comment = 'No se hace validacion.'
+    comment = ''
     # return state_val, nodos_val, comment
 
     structure_ref = referenciaRBT()

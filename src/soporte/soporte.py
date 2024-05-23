@@ -10,6 +10,7 @@ colorRight = 'blue'     # Color para conexiones a la derecha
 colorLeft = 'green'     # Color para conexiones a la izquierda
 colorHigh = 'red'       # Color para resaltar un elemento
 col = "black"           # Color por defecto
+colorHighRBT = 'blue' # Color para resaltar un elemento RBT
 
 def checkAlgoritmGraph(type, recorrido):
     '''

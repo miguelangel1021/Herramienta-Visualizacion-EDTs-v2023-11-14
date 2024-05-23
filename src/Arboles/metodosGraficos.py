@@ -2,7 +2,7 @@ from DISClib.ADT import orderedmap as omap
 from DISClib.ADT import list as lt
 from DISClib.Algorithms.Trees import traversal as tr
 from graphviz import Digraph, Graph
-from soporte.soporte import defaultfunction,get_random_string,colorHigh,colorLeft,colorPointer,colorRight
+from soporte.soporte import defaultfunction,get_random_string,colorHigh,colorLeft,colorPointer,colorRight,colorHighRBT
 from io import BytesIO
 
 class BST_grafico():
@@ -181,7 +181,7 @@ class RBT_grafico():
                     dot.node(name='root', label='root', color='white',
                              shape="circle", fixedsize="True", width="0.4")
                     if (lst != [] and tree['value'] in lst):
-                        dot.node(name=str(tree['value']), label=str(tree['value']), color=colorHigh, shape="circle",
+                        dot.node(name=str(tree['value']), label=str(tree['value']), color=colorHighRBT, shape="circle",
                                  fixedsize="True", width="0.4", style="filled", fillcolor=returnColor(tree), fontcolor="white")
                     else:
                         dot.node(name=str(tree['value']), label=str(tree['value']), color=col, shape="circle",
@@ -192,7 +192,7 @@ class RBT_grafico():
                 if tree['left'] != None:
                     col = "black"
                     if (lst != [] and tree['left']['value'] in lst):
-                        col = "red"
+                        col = "blue"
                     dot.node(name=str(tree['left']['value']), label=str(tree['left']['value']),
                              color=col, shape="circle", fixedsize="True", width="0.4", style="filled", fillcolor=returnColor(tree["left"]), fontcolor="white")
                     #col = "black"
@@ -209,7 +209,7 @@ class RBT_grafico():
                 if tree['right'] != None:
                     col = "black"
                     if (lst != [] and tree['right']['value'] in lst):
-                        col = "red"
+                        col = "blue"
                     dot.node(name=str(tree['right']['value']), label=str(tree['right']['value']),
                              color=col, shape="circle", fixedsize="True", width="0.4", style="filled", fillcolor=returnColor(tree["right"]), fontcolor="white")
                     #col = "black"

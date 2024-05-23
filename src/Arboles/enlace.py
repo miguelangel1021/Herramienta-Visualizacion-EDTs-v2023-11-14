@@ -615,18 +615,12 @@ def findAdjacentNodoRBT(estructura, nodo, order):
         raise Exception(e)
     try:
         listaAdj = estructura.findAdjacentNode(nodo)
-        state_val, listaAdj_val, comment, exists = validar_rbt_adyacentes(init_test, listaAdj, nodo, order) 
+        state_val, listaAdj_val, comment = validar_rbt_adyacentes(init_test, listaAdj, nodo, order) 
     except:
         e = '\tProblema al buscar los adyacentes del elemento "' + str(nodo) + '" , método findAdjacentNode()'
         raise Exception(e)
     
-    dis = displayRBT(estructura, listaAdj)
-    
-    if not exists:
-        print('Encontrar Adyacentes\n\tEl elemento "'+str(nodo)+ '" no existe en el bst')
-    else:
-        print('Encontrar Adyacentes')
-        print(state_val, comment)
+    dis = displayRBT(estructura, listaAdj[1])
     
     nodos = estructura.getNodeValues()
     print("Nodos: ", nodos)
