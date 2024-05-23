@@ -532,7 +532,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                         validacion+= "El vertice " +str(i)+" no debería aparecer en el recorrido. \n"
 
                 validacion += "Vertices esperados:  "+refText+"\n"
-                validacion += "Vertices obtenidos:  "+refText+"\n"
+                validacion += "Vertices obtenidos:  "+testText+"\n"
             #Validación de arcos
             if len(result_ref[0]) != len(result_test[0]):
                 state_val = "FAILED"
@@ -545,11 +545,20 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
                 if arco not in result_ref[0]:
                     state_val = "FAILED"
                     validacion+= "El arco " +str(arco[0])+flecha+str(arco[1])+" no debería aparecer en el recorrido. \n"
+            
+            for arco in result_ref[0]:
+                arcos_ref= arcos + str(arco[0])+flecha+str(arco[1])+" \n"
+            
+            #NO se puede validar a ciencia sierta si el recorrido es correcto o no
             state_val = VALIDATION_STATES[1]
             comment = 'El algoritmo ' + recorrido + ' se ha ejecutado desde el elemento "'+ nodo + '"\n'
             comment += "Vertices del recorrido:  "+testText+"\n"
             comment += "Arcos del recorrido: \n"
             comment+= arcos
+            comment += "Vertices simulados:  "+refText+"\n"
+            comment += "Arcos simulados: \n"
+            comment+= arcos_ref
+
             if state_val == "FAILED":
                 comment += validacion
 
@@ -676,6 +685,10 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
             comment += pre_text_test + " \n"
             comment += post_text_test + " \n"
             comment += reverse_text_test + " \n"
+            comment += "\nRespuesta del algoritmo ejecutado por la app: \n"
+            comment += pre_text_ref + " \n"
+            comment += post_text_ref + " \n"
+            comment += reverse_text_ref + " \n"
             state_val = VALIDATION_STATES[1]
             if state_val == VALIDATION_STATES[-1]:
                 comment += validacion
@@ -695,7 +708,7 @@ def validarRecorridosGrafo(estructura, tipo, tipo_inData, recorrido, result_test
         testWeight = result_test[1]
         
         refEdges = result_ref[0]
-        refWeight = result_ref[1]
+        refWeight = round(result_ref[1],2)
         
         for i in refEdges:
             refText = refText + '(' + i[0] + '->' + i[1] + '), '
