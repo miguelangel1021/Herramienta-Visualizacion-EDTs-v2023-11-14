@@ -807,6 +807,7 @@ def EncontrarAdyacentesArbol():
                 else:
                     respuesta = findAdjacentNodoRBT(user_sessions[session_id].estructura, data, user_sessions[session_id].rbt_order)
         except Exception as e:
+            traceback.print_exc()
             raise DefaultError(str(e))
     else:
         raise DefaultError("Por favor ingrese un valor")

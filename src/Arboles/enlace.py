@@ -627,7 +627,7 @@ def findAdjacentNodoRBT(estructura, nodo, order):
     print('Altura del arbol: ', str(estructura.size()))
     
     info = {"Encontrar Adyacentes": nodo, 
-            "Adyacentes": listaAdj,
+            "Adyacentes": listaAdj[1],
             'state': state_val,
             'comment': comment,
             'Adyacentes obtenidos': None,

@@ -795,6 +795,8 @@ def validar_rbt_adyacentes(init_test, listaAdj, nodo, order):
         exists: indica si el nodo existe en la lista
         
     '''
+    state_val = VALIDATION_STATES[1]
+    comment = ""
     structure_ref = referenciaRBT()
     for i in order: 
         if i[1] == "AÑADIR":
